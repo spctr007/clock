@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Mobile Test - Time Display</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .time-display {
+            font-size: clamp(3rem, 15vw, 8rem);
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .date-display {
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .info {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .test-button {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 0.5rem;
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        .test-button:hover, .test-button:active {
+            background: rgba(59, 130, 246, 0.3);
+        }
+        
+        .status {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .status.success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+        }
+        
+        .status.error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="time-display" id="timeDisplay">--:--</div>
+    <div class="date-display" id="dateDisplay">Loading...</div>
+    
+    <div class="info">
+        <strong>Mobile Compatibility Test</strong><br>
+        User Agent: <span id="userAgent"></span><br>
+        Screen: <span id="screenInfo"></span><br>
+        Viewport: <span id="viewportInfo"></span><br>
+        Touch Support: <span id="touchSupport"></span><br>
+        ES6 Modules: <span id="moduleSupport"></span>
+    </div>
+    
+    <button class="test-button" onclick="testLocalStorage()">Test Local Storage</button>
+    <button class="test-button" onclick="testTouch()">Test Touch Events</button>
+    <button class="test-button" onclick="testOrientation()">Test Orientation</button>
+    
+    <div class="status" id="status" style="display: none;"></div>
+    
+    <script>
+        // Update device info
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        document.getElementById('screenInfo').textContent = `${screen.width}x${screen.height}`;
+        document.getElementById('viewportInfo').textContent = `${window.innerWidth}x${window.innerHeight}`;
+        document.getElementById('touchSupport').textContent = 'ontouchstart' in window ? 'Yes' : 'No';
+        document.getElementById('moduleSupport').textContent = 'noModule' in HTMLScriptElement.prototype ? 'Yes' : 'No';
+        
+        // Time display
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            document.getElementById('timeDisplay').textContent = timeString;
+            document.getElementById('dateDisplay').textContent = dateString;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // Test functions
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + (isError ? 'error' : 'success');
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+        
+        function testLocalStorage() {
+            try {
+                localStorage.setItem('test', 'value');
+                const value = localStorage.getItem('test');
+                localStorage.removeItem('test');
+                showStatus('Local Storage: Working ✓');
+            } catch (error) {
+                showStatus('Local Storage: Failed ✗', true);
+            }
+        }
+        
+        function testTouch() {
+            if ('ontouchstart' in window) {
+                showStatus('Touch Events: Supported ✓');
+            } else {
+                showStatus('Touch Events: Not supported ✗', true);
+            }
+        }
+        
+        function testOrientation() {
+            if (screen.orientation) {
+                showStatus(`Orientation: ${screen.orientation.type} ✓`);
+            } else if (window.orientation !== undefined) {
+                showStatus(`Orientation: ${window.orientation}° ✓`);
+            } else {
+                showStatus('Orientation API: Not supported ✗', true);
+            }
+        }
+        
+        // Orientation change handler
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                document.getElementById('viewportInfo').textContent = `${window.innerWidth}x${window.innerHeight}`;
+            }, 100);
+        });
+        
+        // Touch event logging
+        if ('ontouchstart' in window) {
+            document.addEventListener('touchstart', function(e) {
+                console.log('Touch start:', e.touches.length, 'touches');
+            });
+        }
+        
+        console.log('Mobile test page loaded successfully');
+    </script>
+</body>
+</html>

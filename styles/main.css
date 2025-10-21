@@ -1158,6 +1158,33 @@ button {
     font-size: 0.875rem;
 }
 
+/* Mobile-first responsive design */
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+    /* Mobile touch devices */
+    .settings-toggle {
+        width: 4rem;
+        height: 4rem;
+        font-size: 1.5rem;
+    }
+    
+    .setting-checkbox {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    
+    .world-clock-remove {
+        padding: 0.5rem;
+        font-size: 1.25rem;
+    }
+    
+    /* Increase touch targets */
+    button, .setting-label, .upload-label {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
 /* Responsive Design - time.is inspired breakpoints */
 @media (max-width: 1200px) {
     .app-container {
@@ -1173,6 +1200,7 @@ button {
     .app-container {
         grid-template-rows: 1fr auto;
         padding: 1rem 0.5rem;
+        overflow-x: hidden;
     }
 
     .settings-panel {
@@ -1183,6 +1211,7 @@ button {
     .settings-content {
         width: 280px;
         right: -1rem;
+        max-height: 70vh;
     }
 
     .time-display-section {
@@ -1192,21 +1221,52 @@ button {
     .time-display {
         gap: 0.5rem;
         margin-bottom: 1rem;
+        flex-wrap: wrap;
     }
 
     .date-display {
         margin-bottom: 1.5rem;
+    }
+    
+    /* Better mobile font scaling */
+    .time-text {
+        font-size: clamp(6rem, 25vw, 12rem) !important;
+    }
+    
+    .ampm-text {
+        font-size: clamp(1.2rem, 5vw, 2rem);
+    }
+    
+    .date-text {
+        font-size: clamp(1rem, 4vw, 1.4rem);
+    }
+    
+    /* Mobile world clocks */
+    .world-clocks-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 0 1rem;
+    }
+    
+    .world-clock-display {
+        min-width: auto;
+        width: 100%;
     }
 }
 
 @media (max-width: 480px) {
     .app-container {
         padding: 0.5rem;
+        min-height: 100vh;
+        min-height: 100dvh; /* Dynamic viewport height for mobile */
     }
 
     .settings-content {
         width: calc(100vw - 2rem);
         right: -1rem;
+        left: 1rem;
+        max-height: 60vh;
+        max-height: 60dvh;
     }
 
     .error-message {
@@ -1214,6 +1274,7 @@ button {
         right: 1rem;
         transform: none;
         max-width: none;
+        font-size: 0.875rem;
     }
 
     .time-display-section {
@@ -1229,6 +1290,38 @@ button {
 
     .ampm-text {
         margin-top: -0.5rem;
+        margin-left: 0;
+    }
+    
+    /* Extra small mobile adjustments */
+    .time-text {
+        font-size: clamp(4rem, 20vw, 8rem) !important;
+        padding: 0.5rem 1rem;
+    }
+    
+    .date-text {
+        font-size: clamp(0.875rem, 3.5vw, 1.2rem);
+        padding: 0.5rem 1rem;
+    }
+    
+    .countdown-text {
+        font-size: clamp(0.875rem, 3vw, 1.2rem);
+    }
+    
+    /* Mobile settings adjustments */
+    .settings-toggle {
+        width: 3rem;
+        height: 3rem;
+        font-size: 1rem;
+    }
+    
+    .setting-item {
+        margin-bottom: 1rem;
+    }
+    
+    .setting-label {
+        font-size: 0.875rem;
+        padding: 0.75rem 0;
     }
 }
 
@@ -1712,5 +1805,79 @@ d Timezone Selector Styles */
 
     .time-text:hover {
         transform: none;
+    }
+}
+/* Mob
+ile touch optimizations */
+@media (pointer: coarse) {
+    /* Increase touch targets for mobile */
+    .settings-toggle,
+    .world-clock-remove,
+    .error-close,
+    .add-clock-button,
+    .reset-button {
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+        touch-action: manipulation;
+    }
+    
+    /* Prevent zoom on input focus */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+    
+    /* Better mobile scrolling */
+    .settings-content {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+    .app-container {
+        height: 100vh;
+        height: -webkit-fill-available;
+    }
+    
+    /* Fix iOS viewport height issues */
+    body {
+        height: 100vh;
+        height: -webkit-fill-available;
+    }
+}
+
+/* Android Chrome specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: .001dpcm) {
+    .time-text {
+        -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Landscape mobile orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+    .app-container {
+        padding: 0.5rem;
+    }
+    
+    .time-text {
+        font-size: clamp(3rem, 15vw, 6rem) !important;
+    }
+    
+    .settings-content {
+        max-height: 50vh;
+        max-height: 50dvh;
+    }
+}
+
+/* Very small screens (older phones) */
+@media (max-width: 320px) {
+    .time-text {
+        font-size: clamp(3rem, 18vw, 5rem) !important;
+    }
+    
+    .settings-content {
+        width: calc(100vw - 1rem);
+        right: -0.5rem;
+        left: 0.5rem;
     }
 }
