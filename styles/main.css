@@ -407,19 +407,49 @@ button {
     animation: pulse 1s infinite;
 }
 
-/* Settings Panel - Bootstrap enhanced */
+/* Settings Panel - Bootstrap Only */
 .settings-panel {
-    top: 2rem;
-    right: 2rem;
-    z-index: 1050; /* Bootstrap z-index for modals */
+    z-index: 1060 !important; /* Higher than Bootstrap modals */
     animation: fadeInUp 1s ease 0.5s both;
 }
 
-/* Mobile-specific settings panel positioning */
-@media (max-width: 768px) {
+/* Bootstrap dropdown menu styling */
+.settings-panel .dropdown-menu {
+    background: rgba(0, 0, 0, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(20px);
+    border-radius: 12px !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
+    z-index: 1070 !important;
+}
+
+/* Settings toggle button styling */
+.settings-toggle {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.settings-toggle:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    transform: scale(1.1) rotate(90deg);
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    color: #ffffff !important;
+}
+
+.settings-toggle:active {
+    transform: scale(1.05) rotate(90deg);
+}
+
+/* Mobile settings panel positioning */
+@media (max-width: 767.98px) {
     .settings-panel {
-        top: 1rem;
-        right: 1rem;
+        top: 1rem !important;
+        right: 1rem !important;
     }
 }
 
@@ -447,57 +477,7 @@ button {
     transform: scale(1.05) rotate(90deg);
 }
 
-.settings-content {
-    position: absolute;
-    top: 4.5rem;
-    right: 0;
-    width: 320px;
-    background: rgba(0, 0, 0, 0.85) !important;
-    backdrop-filter: blur(30px);
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    transform: translateY(-20px) scale(0.95);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-/* Desktop settings content positioning */
-@media (min-width: 768px) {
-    .settings-content {
-        position: absolute;
-        top: 4.5rem;
-        right: 0;
-        width: 320px;
-    }
-}
-
-.settings-content:not([hidden]) {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Custom scrollbar for settings content */
-.settings-content::-webkit-scrollbar {
-    width: 6px;
-}
-
-.settings-content::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 3px;
-}
-
-.settings-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-}
-
-.settings-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
+/* Old settings-content CSS removed - now using Bootstrap dropdown and offcanvas */
 
 .settings-group {
     margin-bottom: 2rem;

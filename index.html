@@ -47,17 +47,36 @@
             </div>
         </div>
 
-        <aside class="settings-panel position-fixed" id="settingsPanel" aria-label="Time display settings">
-            <button class="settings-toggle btn btn-outline-light rounded-circle" id="settingsToggle" 
-                    data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" 
-                    aria-controls="settingsOffcanvas" aria-expanded="false">
+        <!-- Settings Panel - Bootstrap Only -->
+        <div class="settings-panel position-fixed" style="top: 2rem; right: 2rem; z-index: 1060;">
+            <!-- Desktop Dropdown Button -->
+            <div class="dropdown d-none d-md-block">
+                <button class="settings-toggle btn btn-outline-light rounded-circle" 
+                        type="button" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                        style="width: 3.5rem; height: 3.5rem; font-size: 1.25rem;">
+                    <span class="visually-hidden">Toggle settings</span>
+                    ⚙️
+                </button>
+                <div class="dropdown-menu dropdown-menu-end p-0" 
+                     style="width: 320px; background: rgba(0, 0, 0, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(20px);">
+                    <div class="p-3" id="desktopSettingsContent">
+                        <!-- Desktop settings content will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile Offcanvas Button -->
+            <button class="settings-toggle btn btn-outline-light rounded-circle d-md-none" 
+                    type="button"
+                    data-bs-toggle="offcanvas" 
+                    data-bs-target="#settingsOffcanvas"
+                    style="width: 3.5rem; height: 3.5rem; font-size: 1.25rem;">
                 <span class="visually-hidden">Toggle settings</span>
-                <span class="settings-icon">⚙️</span>
+                ⚙️
             </button>
-        </aside>
-
-        <!-- Desktop Settings Panel -->
-        <div class="settings-content card bg-dark border-secondary d-none d-md-block" id="settingsContent" hidden>
+        </div>
                 <div class="card-body">
                     <div class="settings-group mb-4">
                         <h5 class="settings-title card-title text-light mb-3">Display Settings</h5>
@@ -401,104 +420,93 @@
             console.log('Time display started');
         }
 
-        // Setup settings functionality
+        // Setup settings functionality - Bootstrap Only
         function setupSettings() {
-            const settingsToggle = document.getElementById('settingsToggle');
-            const settingsContent = document.getElementById('settingsContent');
+            const desktopSettingsContent = document.getElementById('desktopSettingsContent');
             const mobileSettingsContent = document.getElementById('mobileSettingsContent');
-            const showSecondsCheckbox = document.getElementById('showSeconds');
-            const use24HourCheckbox = document.getElementById('use24Hour');
 
-            // Populate mobile settings content
-            if (mobileSettingsContent && settingsContent) {
-                // Clone the desktop settings content for mobile
-                const desktopContent = settingsContent.querySelector('.card-body');
-                if (desktopContent) {
-                    mobileSettingsContent.innerHTML = desktopContent.innerHTML;
-                }
+            // Create the settings HTML template
+            const settingsHTML = `
+                <div class="settings-group mb-4">
+                    <h6 class="text-light mb-3">Display Settings</h6>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" id="showSeconds" class="form-check-input">
+                        <label class="form-check-label text-light" for="showSeconds">Show seconds</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" id="use24Hour" class="form-check-input">
+                        <label class="form-check-label text-light" for="use24Hour">24-hour format</label>
+                    </div>
+                </div>
+
+                <div class="settings-group mb-4">
+                    <h6 class="text-light mb-3">World Clocks</h6>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" id="showWorldClocks" class="form-check-input">
+                        <label class="form-check-label text-light" for="showWorldClocks">Show world clocks</label>
+                    </div>
+                    <div class="world-clock-settings" id="worldClockSettings">
+                        <div class="world-clock-list mb-3" id="worldClockList"></div>
+                        <div class="add-world-clock" id="addWorldClockSection">
+                            <select id="timezoneSelect" class="form-select form-select-sm bg-dark text-light border-secondary mb-2">
+                                <option value="">Select a timezone...</option>
+                                <option value="America/New_York">New York (EST/EDT)</option>
+                                <option value="America/Los_Angeles">Los Angeles (PST/PDT)</option>
+                                <option value="America/Chicago">Chicago (CST/CDT)</option>
+                                <option value="America/Denver">Denver (MST/MDT)</option>
+                                <option value="Europe/London">London (GMT/BST)</option>
+                                <option value="Europe/Paris">Paris (CET/CEST)</option>
+                                <option value="Europe/Monaco">Monaco (CET/CEST)</option>
+                                <option value="Europe/Berlin">Berlin (CET/CEST)</option>
+                                <option value="Europe/Rome">Rome (CET/CEST)</option>
+                                <option value="Europe/Madrid">Madrid (CET/CEST)</option>
+                                <option value="Asia/Tokyo">Tokyo (JST)</option>
+                                <option value="Asia/Shanghai">Shanghai (CST)</option>
+                                <option value="Asia/Hong_Kong">Hong Kong (HKT)</option>
+                                <option value="Asia/Singapore">Singapore (SGT)</option>
+                                <option value="Asia/Dubai">Dubai (GST)</option>
+                                <option value="Asia/Kolkata">Mumbai (IST)</option>
+                                <option value="Australia/Sydney">Sydney (AEST/AEDT)</option>
+                                <option value="Australia/Melbourne">Melbourne (AEST/AEDT)</option>
+                                <option value="Pacific/Auckland">Auckland (NZST/NZDT)</option>
+                                <option value="America/Sao_Paulo">São Paulo (BRT/BRST)</option>
+                                <option value="America/Mexico_City">Mexico City (CST/CDT)</option>
+                            </select>
+                            <button id="addWorldClockBtn" class="btn btn-outline-primary btn-sm w-100" disabled>
+                                Add World Clock
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h6 class="text-light mb-3">Background</h6>
+                    <div class="mb-3">
+                        <label for="backgroundUpload" class="form-label text-light">Upload Background</label>
+                        <input type="file" id="backgroundUpload" class="form-control form-control-sm bg-dark text-light border-secondary" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <label for="opacitySlider" class="form-label text-light">
+                            Background Opacity: <span class="opacity-value" id="opacityValue">50%</span>
+                        </label>
+                        <input type="range" id="opacitySlider" class="form-range" min="0" max="100" value="50">
+                    </div>
+                    <button class="btn btn-outline-danger btn-sm w-100" id="resetBackground">
+                        Reset to Default
+                    </button>
+                </div>
+            `;
+
+            // Populate both desktop and mobile settings
+            if (desktopSettingsContent) {
+                desktopSettingsContent.innerHTML = settingsHTML;
+            }
+            if (mobileSettingsContent) {
+                mobileSettingsContent.innerHTML = settingsHTML;
             }
 
-            // Setup responsive behavior
-            function setupResponsiveBehavior() {
-                const currentToggle = document.getElementById('settingsToggle');
-                const isDesktop = window.innerWidth >= 768;
-                
-                console.log('Setting up responsive behavior - Desktop:', isDesktop, 'Width:', window.innerWidth);
-                
-                if (isDesktop && currentToggle && settingsContent) {
-                    // Desktop: Remove Bootstrap attributes and add click handler
-                    currentToggle.removeAttribute('data-bs-toggle');
-                    currentToggle.removeAttribute('data-bs-target');
-                    
-                    // Add desktop click handler (remove existing first)
-                    currentToggle.onclick = function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        console.log('Desktop settings button clicked');
-                        const isHidden = settingsContent.hidden;
-                        settingsContent.hidden = !isHidden;
-                        currentToggle.setAttribute('aria-expanded', !isHidden);
-                        console.log('Desktop settings panel toggled:', !isHidden);
-                    };
-                    
-                    console.log('Desktop settings mode activated - Bootstrap attributes removed');
-                } else if (!isDesktop && currentToggle) {
-                    // Mobile: Ensure Bootstrap attributes are present and remove click handler
-                    currentToggle.setAttribute('data-bs-toggle', 'offcanvas');
-                    currentToggle.setAttribute('data-bs-target', '#settingsOffcanvas');
-                    currentToggle.onclick = null; // Remove desktop click handler
-                    
-                    console.log('Mobile settings mode activated - Bootstrap offcanvas enabled');
-                    console.log('Bootstrap attributes:', {
-                        'data-bs-toggle': currentToggle.getAttribute('data-bs-toggle'),
-                        'data-bs-target': currentToggle.getAttribute('data-bs-target')
-                    });
-                }
-            }
-
-            // Initial setup
-            setupResponsiveBehavior();
-            
-            // Re-setup on window resize
-            let resizeTimeout;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(setupResponsiveBehavior, 250);
-            });
-
-            // Sync settings between desktop and mobile panels
-            function syncSettings() {
-                const desktopCheckboxes = settingsContent ? settingsContent.querySelectorAll('input[type="checkbox"], input[type="range"], select') : [];
-                const mobileCheckboxes = mobileSettingsContent ? mobileSettingsContent.querySelectorAll('input[type="checkbox"], input[type="range"], select') : [];
-                
-                // Sync from desktop to mobile
-                desktopCheckboxes.forEach(input => {
-                    const mobileInput = mobileSettingsContent ? mobileSettingsContent.querySelector(`#${input.id}`) : null;
-                    if (mobileInput) {
-                        if (input.type === 'checkbox') {
-                            mobileInput.checked = input.checked;
-                        } else {
-                            mobileInput.value = input.value;
-                        }
-                    }
-                });
-                
-                // Sync from mobile to desktop
-                mobileCheckboxes.forEach(input => {
-                    const desktopInput = settingsContent ? settingsContent.querySelector(`#${input.id}`) : null;
-                    if (desktopInput) {
-                        if (input.type === 'checkbox') {
-                            desktopInput.checked = input.checked;
-                        } else {
-                            desktopInput.value = input.value;
-                        }
-                    }
-                });
-            }
-
-            // Add event listeners to both desktop and mobile settings
-            function addSettingsListeners(container) {
+            // Add event listeners to both panels
+            function addSettingsListeners(container, prefix = '') {
                 if (!container) return;
                 
                 const showSecondsCheck = container.querySelector('#showSeconds');
@@ -513,7 +521,7 @@
                 if (showSecondsCheck) {
                     showSecondsCheck.addEventListener('change', function () {
                         showSeconds = this.checked;
-                        syncSettings();
+                        syncSettingsBetweenPanels('showSeconds', this.checked);
                         saveSettings();
                     });
                 }
@@ -521,7 +529,7 @@
                 if (use24HourCheck) {
                     use24HourCheck.addEventListener('change', function () {
                         use24Hour = this.checked;
-                        syncSettings();
+                        syncSettingsBetweenPanels('use24Hour', this.checked);
                         saveSettings();
                     });
                 }
@@ -529,7 +537,7 @@
                 if (showWorldClocksCheck) {
                     showWorldClocksCheck.addEventListener('change', function() {
                         showWorldClocks = this.checked;
-                        syncSettings();
+                        syncSettingsBetweenPanels('showWorldClocks', this.checked);
                         saveSettings();
                         updateWorldClockDisplay();
                     });
@@ -538,18 +546,11 @@
                 if (timezoneSelect && addWorldClockBtn) {
                     timezoneSelect.addEventListener('change', function() {
                         addWorldClockBtn.disabled = !this.value;
-                        // Sync the other select
-                        const otherSelect = container === settingsContent ? 
-                            mobileSettingsContent?.querySelector('#timezoneSelect') : 
-                            settingsContent?.querySelector('#timezoneSelect');
-                        if (otherSelect) {
-                            otherSelect.value = this.value;
-                        }
+                        syncSettingsBetweenPanels('timezoneSelect', this.value);
                     });
                     
                     addWorldClockBtn.addEventListener('click', function() {
                         addWorldClock();
-                        syncSettings();
                     });
                 }
                 
@@ -557,10 +558,10 @@
                     opacitySlider.addEventListener('input', function(e) {
                         backgroundOpacity = parseInt(e.target.value) / 100;
                         updateBackgroundOpacity();
-                        syncSettings();
+                        syncSettingsBetweenPanels('opacitySlider', e.target.value);
                         saveSettings();
                         
-                        // Update opacity display
+                        // Update opacity display in both panels
                         const opacityValue = container.querySelector('#opacityValue');
                         if (opacityValue) {
                             opacityValue.textContent = e.target.value + '%';
@@ -577,65 +578,58 @@
                 if (resetButton) {
                     resetButton.addEventListener('click', function() {
                         resetBackground();
-                        syncSettings();
                     });
                 }
             }
 
-            // Add listeners to both panels
-            addSettingsListeners(settingsContent);
-            addSettingsListeners(mobileSettingsContent);
-
-            // Legacy checkbox references (now handled by addSettingsListeners)
-            // Keeping for backward compatibility but functionality moved to unified handler
-            
-            // Background upload functionality
-            const backgroundUpload = document.getElementById('backgroundUpload');
-            const opacitySlider = document.getElementById('opacitySlider');
-            const opacityValue = document.getElementById('opacityValue');
-            const resetButton = document.getElementById('resetBackground');
-            
-            if (backgroundUpload) {
-                backgroundUpload.addEventListener('change', function(e) {
-                    handleBackgroundUpload(e);
-                });
-            }
-            
-            if (opacitySlider) {
-                opacitySlider.addEventListener('input', function(e) {
-                    backgroundOpacity = parseInt(e.target.value) / 100;
-                    updateBackgroundOpacity();
-                    saveSettings();
-                    if (opacityValue) {
-                        opacityValue.textContent = e.target.value + '%';
+            // Sync settings between desktop and mobile panels
+            function syncSettingsBetweenPanels(elementId, value) {
+                const desktopElement = desktopSettingsContent?.querySelector(`#${elementId}`);
+                const mobileElement = mobileSettingsContent?.querySelector(`#${elementId}`);
+                
+                if (desktopElement && mobileElement) {
+                    if (desktopElement.type === 'checkbox') {
+                        desktopElement.checked = value;
+                        mobileElement.checked = value;
+                    } else {
+                        desktopElement.value = value;
+                        mobileElement.value = value;
                     }
-                });
+                    
+                    // Update opacity displays
+                    if (elementId === 'opacitySlider') {
+                        const desktopOpacityValue = desktopSettingsContent?.querySelector('#opacityValue');
+                        const mobileOpacityValue = mobileSettingsContent?.querySelector('#opacityValue');
+                        if (desktopOpacityValue) desktopOpacityValue.textContent = value + '%';
+                        if (mobileOpacityValue) mobileOpacityValue.textContent = value + '%';
+                    }
+                }
             }
-            
-            if (resetButton) {
-                resetButton.addEventListener('click', function() {
-                    resetBackground();
-                });
-            }
-            
+
+            // Add listeners to both panels
+            addSettingsListeners(desktopSettingsContent, 'desktop');
+            addSettingsListeners(mobileSettingsContent, 'mobile');
+
+            // Load initial settings
+            const desktopShowSeconds = desktopSettingsContent?.querySelector('#showSeconds');
+            const mobileShowSeconds = mobileSettingsContent?.querySelector('#showSeconds');
+            const desktopUse24Hour = desktopSettingsContent?.querySelector('#use24Hour');
+            const mobileUse24Hour = mobileSettingsContent?.querySelector('#use24Hour');
+            const desktopOpacitySlider = desktopSettingsContent?.querySelector('#opacitySlider');
+            const mobileOpacitySlider = mobileSettingsContent?.querySelector('#opacitySlider');
+
+            if (desktopShowSeconds) desktopShowSeconds.checked = showSeconds;
+            if (mobileShowSeconds) mobileShowSeconds.checked = showSeconds;
+            if (desktopUse24Hour) desktopUse24Hour.checked = use24Hour;
+            if (mobileUse24Hour) mobileUse24Hour.checked = use24Hour;
+            if (desktopOpacitySlider) desktopOpacitySlider.value = Math.round(backgroundOpacity * 100);
+            if (mobileOpacitySlider) mobileOpacitySlider.value = Math.round(backgroundOpacity * 100);
+
             // Initialize world clock display
             updateWorldClockDisplay();
             updateWorldClockList();
 
-            // Close settings when clicking outside (desktop only)
-            document.addEventListener('click', function (e) {
-                const currentToggle = document.getElementById('settingsToggle');
-                const isDesktop = window.innerWidth >= 768;
-                
-                if (isDesktop && settingsContent && !settingsContent.hidden &&
-                    currentToggle && !currentToggle.contains(e.target) &&
-                    !settingsContent.contains(e.target)) {
-                    settingsContent.hidden = true;
-                    currentToggle.setAttribute('aria-expanded', 'false');
-                }
-            });
-
-            console.log('Settings functionality initialized');
+            console.log('Bootstrap-only settings functionality initialized');
         }
 
         // Setup error handling

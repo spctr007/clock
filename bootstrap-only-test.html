@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Only Settings Test</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .time-display {
+            font-size: clamp(4rem, 15vw, 8rem);
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .settings-panel {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1060;
+        }
+        
+        .settings-toggle {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-toggle:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            transform: scale(1.1) rotate(90deg);
+            color: #ffffff !important;
+        }
+        
+        .dropdown-menu {
+            background: rgba(0, 0, 0, 0.9) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            backdrop-filter: blur(20px);
+            border-radius: 12px !important;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
+            z-index: 1070 !important;
+        }
+        
+        .offcanvas {
+            background: rgba(0, 0, 0, 0.95) !important;
+            width: 90vw !important;
+            max-width: 400px !important;
+            backdrop-filter: blur(20px);
+        }
+        
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-color: #0d6efd !important;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+            color: white !important;
+        }
+        
+        .status {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-12 text-center">
+                <h1 class="mb-4">Bootstrap Only Settings</h1>
+                <div class="time-display" id="timeDisplay">--:--</div>
+                <p class="lead">Testing pure Bootstrap dropdown (desktop) and offcanvas (mobile)</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Panel - Bootstrap Only -->
+    <div class="settings-panel">
+        <!-- Desktop Dropdown -->
+        <div class="dropdown d-none d-md-block">
+            <button class="settings-toggle btn btn-outline-light rounded-circle" 
+                    type="button" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false">
+                ⚙️
+            </button>
+            <div class="dropdown-menu dropdown-menu-end p-0" style="width: 320px;">
+                <div class="p-3">
+                    <h6 class="text-light mb-3">Desktop Settings</h6>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="desktopCheck1">
+                        <label class="form-check-label text-light" for="desktopCheck1">Show seconds</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="desktopCheck2">
+                        <label class="form-check-label text-light" for="desktopCheck2">24-hour format</label>
+                    </div>
+                    <div class="mb-3">
+                        <select class="form-select form-select-sm">
+                            <option>Select timezone...</option>
+                            <option>New York</option>
+                            <option>London</option>
+                            <option>Tokyo</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-light">Opacity: <span>50%</span></label>
+                        <input type="range" class="form-range" min="0" max="100" value="50">
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm w-100">Test Button</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Offcanvas Button -->
+        <button class="settings-toggle btn btn-outline-light rounded-circle d-md-none" 
+                type="button"
+                data-bs-toggle="offcanvas" 
+                data-bs-target="#settingsOffcanvas">
+            ⚙️
+        </button>
+    </div>
+    
+    <!-- Mobile Offcanvas -->
+    <div class="offcanvas offcanvas-end d-md-none" tabindex="-1" id="settingsOffcanvas">
+        <div class="offcanvas-header bg-dark">
+            <h5 class="offcanvas-title text-light">Mobile Settings</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body bg-dark">
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="mobileCheck1">
+                <label class="form-check-label text-light" for="mobileCheck1">Show seconds</label>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="mobileCheck2">
+                <label class="form-check-label text-light" for="mobileCheck2">24-hour format</label>
+            </div>
+            <div class="mb-3">
+                <select class="form-select form-select-sm">
+                    <option>Select timezone...</option>
+                    <option>New York</option>
+                    <option>London</option>
+                    <option>Tokyo</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-light">Opacity: <span>50%</span></label>
+                <input type="range" class="form-range" min="0" max="100" value="50">
+            </div>
+            <button class="btn btn-outline-primary btn-sm w-100">Test Button</button>
+        </div>
+    </div>
+    
+    <!-- Status -->
+    <div class="status">
+        <strong>Status:</strong><br>
+        Screen: <span id="screenWidth">--</span>px<br>
+        Mode: <span id="currentMode">--</span><br>
+        Bootstrap: <span id="bootstrapStatus">--</span>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('timeDisplay').textContent = now.toLocaleTimeString();
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // Update status
+        function updateStatus() {
+            const width = window.innerWidth;
+            const isDesktop = width >= 768;
+            
+            document.getElementById('screenWidth').textContent = width;
+            document.getElementById('currentMode').textContent = isDesktop ? 'Desktop (Dropdown)' : 'Mobile (Offcanvas)';
+            document.getElementById('bootstrapStatus').textContent = window.bootstrap ? 'Loaded' : 'Not loaded';
+        }
+        
+        updateStatus();
+        window.addEventListener('resize', updateStatus);
+        
+        // Test Bootstrap events
+        const dropdown = document.querySelector('.dropdown');
+        const offcanvas = document.getElementById('settingsOffcanvas');
+        
+        if (dropdown) {
+            dropdown.addEventListener('show.bs.dropdown', () => console.log('Dropdown opening'));
+            dropdown.addEventListener('shown.bs.dropdown', () => console.log('Dropdown opened'));
+            dropdown.addEventListener('hide.bs.dropdown', () => console.log('Dropdown closing'));
+            dropdown.addEventListener('hidden.bs.dropdown', () => console.log('Dropdown closed'));
+        }
+        
+        if (offcanvas) {
+            offcanvas.addEventListener('show.bs.offcanvas', () => console.log('Offcanvas opening'));
+            offcanvas.addEventListener('shown.bs.offcanvas', () => console.log('Offcanvas opened'));
+            offcanvas.addEventListener('hide.bs.offcanvas', () => console.log('Offcanvas closing'));
+            offcanvas.addEventListener('hidden.bs.offcanvas', () => console.log('Offcanvas closed'));
+        }
+        
+        console.log('Bootstrap-only test loaded');
+    </script>
+</body>
+</html>
