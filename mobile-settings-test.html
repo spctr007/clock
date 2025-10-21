@@ -293,14 +293,24 @@
         const desktopSettingsToggle = document.getElementById('desktopSettingsToggle');
         const settingsContent = document.getElementById('settingsContent');
         
-        // Desktop settings toggle
-        if (desktopSettingsToggle && settingsContent) {
-            desktopSettingsToggle.addEventListener('click', function() {
-                const isHidden = settingsContent.style.display === 'none' || !settingsContent.style.display;
-                settingsContent.style.display = isHidden ? 'block' : 'none';
-                console.log('Desktop settings toggled:', isHidden);
-            });
+        // Setup responsive behavior
+        function setupResponsiveBehavior() {
+            const isDesktop = window.innerWidth >= 768;
+            console.log('Screen width:', window.innerWidth, 'Desktop mode:', isDesktop);
+            
+            if (isDesktop && desktopSettingsToggle && settingsContent) {
+                // Desktop settings toggle
+                desktopSettingsToggle.onclick = function(e) {
+                    e.preventDefault();
+                    const isHidden = settingsContent.style.display === 'none' || !settingsContent.style.display;
+                    settingsContent.style.display = isHidden ? 'block' : 'none';
+                    console.log('Desktop settings toggled:', isHidden);
+                };
+            }
         }
+        
+        setupResponsiveBehavior();
+        window.addEventListener('resize', setupResponsiveBehavior);
         
         // Test offcanvas events
         const settingsOffcanvas = document.getElementById('settingsOffcanvas');

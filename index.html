@@ -418,19 +418,54 @@
                 }
             }
 
-            // Desktop settings panel toggle (for screens >= md)
-            if (settingsToggle && settingsContent && window.innerWidth >= 768) {
-                // Remove Bootstrap attributes for desktop
-                settingsToggle.removeAttribute('data-bs-toggle');
-                settingsToggle.removeAttribute('data-bs-target');
+            // Setup responsive behavior
+            function setupResponsiveBehavior() {
+                const currentToggle = document.getElementById('settingsToggle');
+                const isDesktop = window.innerWidth >= 768;
                 
-                settingsToggle.addEventListener('click', function () {
-                    const isHidden = settingsContent.hidden;
-                    settingsContent.hidden = !isHidden;
-                    settingsToggle.setAttribute('aria-expanded', !isHidden);
-                    console.log('Desktop settings panel toggled:', !isHidden);
-                });
+                console.log('Setting up responsive behavior - Desktop:', isDesktop, 'Width:', window.innerWidth);
+                
+                if (isDesktop && currentToggle && settingsContent) {
+                    // Desktop: Remove Bootstrap attributes and add click handler
+                    currentToggle.removeAttribute('data-bs-toggle');
+                    currentToggle.removeAttribute('data-bs-target');
+                    
+                    // Add desktop click handler (remove existing first)
+                    currentToggle.onclick = function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        console.log('Desktop settings button clicked');
+                        const isHidden = settingsContent.hidden;
+                        settingsContent.hidden = !isHidden;
+                        currentToggle.setAttribute('aria-expanded', !isHidden);
+                        console.log('Desktop settings panel toggled:', !isHidden);
+                    };
+                    
+                    console.log('Desktop settings mode activated - Bootstrap attributes removed');
+                } else if (!isDesktop && currentToggle) {
+                    // Mobile: Ensure Bootstrap attributes are present and remove click handler
+                    currentToggle.setAttribute('data-bs-toggle', 'offcanvas');
+                    currentToggle.setAttribute('data-bs-target', '#settingsOffcanvas');
+                    currentToggle.onclick = null; // Remove desktop click handler
+                    
+                    console.log('Mobile settings mode activated - Bootstrap offcanvas enabled');
+                    console.log('Bootstrap attributes:', {
+                        'data-bs-toggle': currentToggle.getAttribute('data-bs-toggle'),
+                        'data-bs-target': currentToggle.getAttribute('data-bs-target')
+                    });
+                }
             }
+
+            // Initial setup
+            setupResponsiveBehavior();
+            
+            // Re-setup on window resize
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(setupResponsiveBehavior, 250);
+            });
 
             // Sync settings between desktop and mobile panels
             function syncSettings() {
@@ -587,13 +622,16 @@
             updateWorldClockDisplay();
             updateWorldClockList();
 
-            // Close settings when clicking outside
+            // Close settings when clicking outside (desktop only)
             document.addEventListener('click', function (e) {
-                if (settingsContent && !settingsContent.hidden &&
-                    !settingsToggle.contains(e.target) &&
+                const currentToggle = document.getElementById('settingsToggle');
+                const isDesktop = window.innerWidth >= 768;
+                
+                if (isDesktop && settingsContent && !settingsContent.hidden &&
+                    currentToggle && !currentToggle.contains(e.target) &&
                     !settingsContent.contains(e.target)) {
                     settingsContent.hidden = true;
-                    settingsToggle.setAttribute('aria-expanded', 'false');
+                    currentToggle.setAttribute('aria-expanded', 'false');
                 }
             });
 

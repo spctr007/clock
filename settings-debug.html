@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings Debug Test</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .settings-panel {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1050;
+        }
+        
+        .settings-toggle {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+            font-size: 1.25rem;
+        }
+        
+        .settings-content {
+            position: absolute;
+            top: 4.5rem;
+            right: 0;
+            width: 320px;
+            background: rgba(0, 0, 0, 0.9) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        
+        .debug-info {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .offcanvas {
+            background: rgba(0, 0, 0, 0.95) !important;
+            width: 90vw !important;
+            max-width: 400px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Settings Debug Test</h1>
+        <p class="lead">Testing responsive settings panel behavior</p>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-body">
+                        <h5 class="card-title">Current Status</h5>
+                        <p>Screen Width: <span id="screenWidth">--</span>px</p>
+                        <p>Mode: <span id="currentMode">--</span></p>
+                        <p>Settings Panel: <span id="panelStatus">--</span></p>
+                        <button class="btn btn-primary" onclick="testSettings()">Test Settings Toggle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Panel -->
+    <div class="settings-panel">
+        <button class="settings-toggle btn btn-outline-light rounded-circle" id="settingsToggle"
+                data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas">
+            ⚙️
+        </button>
+    </div>
+    
+    <!-- Desktop Settings -->
+    <div class="settings-content card d-none d-md-block" id="settingsContent" hidden>
+        <div class="card-body">
+            <h6 class="text-light mb-3">Desktop Settings</h6>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="desktopCheck1">
+                <label class="form-check-label text-light" for="desktopCheck1">Test Option 1</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="desktopCheck2">
+                <label class="form-check-label text-light" for="desktopCheck2">Test Option 2</label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Offcanvas -->
+    <div class="offcanvas offcanvas-end d-md-none" id="settingsOffcanvas">
+        <div class="offcanvas-header bg-dark">
+            <h5 class="offcanvas-title text-light">Mobile Settings</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body bg-dark">
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="mobileCheck1">
+                <label class="form-check-label text-light" for="mobileCheck1">Test Option 1</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="mobileCheck2">
+                <label class="form-check-label text-light" for="mobileCheck2">Test Option 2</label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Debug Info -->
+    <div class="debug-info">
+        <div><strong>Debug Log:</strong></div>
+        <div id="debugLog">Initializing...</div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let debugMessages = [];
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugMessages.push(`[${timestamp}] ${message}`);
+            if (debugMessages.length > 10) debugMessages.shift();
+            document.getElementById('debugLog').innerHTML = debugMessages.join('<br>');
+            console.log(message);
+        }
+        
+        function updateStatus() {
+            const width = window.innerWidth;
+            const isDesktop = width >= 768;
+            
+            document.getElementById('screenWidth').textContent = width;
+            document.getElementById('currentMode').textContent = isDesktop ? 'Desktop' : 'Mobile';
+            
+            const settingsContent = document.getElementById('settingsContent');
+            const panelVisible = settingsContent && !settingsContent.hidden;
+            document.getElementById('panelStatus').textContent = panelVisible ? 'Visible' : 'Hidden';
+        }
+        
+        function setupResponsiveBehavior() {
+            const settingsToggle = document.getElementById('settingsToggle');
+            const settingsContent = document.getElementById('settingsContent');
+            const isDesktop = window.innerWidth >= 768;
+            
+            log(`Setting up for ${isDesktop ? 'desktop' : 'mobile'} (${window.innerWidth}px)`);
+            
+            if (isDesktop && settingsToggle && settingsContent) {
+                // Desktop mode
+                settingsToggle.removeAttribute('data-bs-toggle');
+                settingsToggle.removeAttribute('data-bs-target');
+                
+                settingsToggle.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    log('Desktop settings button clicked');
+                    const isHidden = settingsContent.hidden;
+                    settingsContent.hidden = !isHidden;
+                    settingsToggle.setAttribute('aria-expanded', !isHidden);
+                    log(`Desktop panel ${isHidden ? 'opened' : 'closed'}`);
+                    updateStatus();
+                };
+                
+                log('Desktop mode activated - click handler added');
+            } else if (!isDesktop && settingsToggle) {
+                // Mobile mode
+                settingsToggle.setAttribute('data-bs-toggle', 'offcanvas');
+                settingsToggle.setAttribute('data-bs-target', '#settingsOffcanvas');
+                settingsToggle.onclick = null;
+                
+                log('Mobile mode activated - Bootstrap offcanvas enabled');
+            }
+            
+            updateStatus();
+        }
+        
+        function testSettings() {
+            const settingsToggle = document.getElementById('settingsToggle');
+            log('Manual test button clicked');
+            if (settingsToggle) {
+                settingsToggle.click();
+                log('Settings toggle clicked programmatically');
+            }
+        }
+        
+        // Initialize
+        log('Page loaded, setting up...');
+        setupResponsiveBehavior();
+        updateStatus();
+        
+        // Handle resize
+        window.addEventListener('resize', function() {
+            log('Window resized');
+            setTimeout(() => {
+                setupResponsiveBehavior();
+                updateStatus();
+            }, 100);
+        });
+        
+        // Handle offcanvas events
+        const offcanvas = document.getElementById('settingsOffcanvas');
+        if (offcanvas) {
+            offcanvas.addEventListener('show.bs.offcanvas', () => log('Offcanvas opening'));
+            offcanvas.addEventListener('shown.bs.offcanvas', () => log('Offcanvas opened'));
+            offcanvas.addEventListener('hide.bs.offcanvas', () => log('Offcanvas closing'));
+            offcanvas.addEventListener('hidden.bs.offcanvas', () => log('Offcanvas closed'));
+        }
+        
+        // Close desktop settings on outside click
+        document.addEventListener('click', function(e) {
+            const settingsToggle = document.getElementById('settingsToggle');
+            const settingsContent = document.getElementById('settingsContent');
+            const isDesktop = window.innerWidth >= 768;
+            
+            if (isDesktop && settingsContent && !settingsContent.hidden &&
+                settingsToggle && !settingsToggle.contains(e.target) &&
+                !settingsContent.contains(e.target)) {
+                settingsContent.hidden = true;
+                settingsToggle.setAttribute('aria-expanded', 'false');
+                log('Desktop panel closed by outside click');
+                updateStatus();
+            }
+        });
+        
+        log('Setup complete');
+    </script>
+</body>
+</html>
