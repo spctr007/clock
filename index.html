@@ -399,6 +399,17 @@
                     const isHidden = settingsContent.hidden;
                     settingsContent.hidden = !isHidden;
                     settingsToggle.setAttribute('aria-expanded', !isHidden);
+                    
+                    // Ensure proper mobile positioning when opened
+                    if (!isHidden && window.innerWidth <= 768) {
+                        settingsContent.style.position = 'fixed';
+                        settingsContent.style.left = '1rem';
+                        settingsContent.style.right = '1rem';
+                        settingsContent.style.width = 'auto';
+                        settingsContent.style.top = '4rem';
+                        settingsContent.style.maxHeight = 'calc(100vh - 5rem)';
+                    }
+                    
                     console.log('Settings panel toggled:', !isHidden);
                 });
             }

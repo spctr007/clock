@@ -201,6 +201,15 @@
                 e.preventDefault();
                 this.click();
             });
+            
+            // Ensure settings panel is properly positioned on mobile
+            if (settingsContent) {
+                settingsContent.style.position = 'fixed';
+                settingsContent.style.left = '0.5rem';
+                settingsContent.style.right = '0.5rem';
+                settingsContent.style.width = 'auto';
+                settingsContent.style.maxHeight = 'calc(100vh - 4rem)';
+            }
         }
     }
     

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Mobile Settings Test</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .settings-panel {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1050;
+        }
+        
+        .settings-toggle {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-toggle:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            transform: scale(1.1) rotate(90deg);
+            color: #ffffff !important;
+        }
+        
+        .settings-content {
+            position: fixed;
+            top: 4rem;
+            right: 1rem;
+            left: 1rem;
+            width: auto;
+            background: rgba(0, 0, 0, 0.9) !important;
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 12px;
+            max-height: calc(100vh - 5rem);
+            overflow-y: auto;
+            transform: translateY(-20px) scale(0.95);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-content:not([hidden]) {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        @media (max-width: 480px) {
+            .settings-content {
+                top: 3.5rem;
+                right: 0.5rem;
+                left: 0.5rem;
+                max-height: calc(100vh - 4rem);
+            }
+        }
+        
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-color: #0d6efd !important;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+            color: white !important;
+        }
+        
+        .device-info {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid h-100">
+        <div class="row h-100 justify-content-center align-items-center">
+            <div class="col-12 text-center">
+                <h1 class="display-4 mb-4">Mobile Settings Test</h1>
+                <p class="lead">Click the settings button to test mobile positioning</p>
+                
+                <div class="mt-4">
+                    <div class="h2" id="timeDisplay">--:--</div>
+                    <div class="text-muted" id="dateDisplay">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Panel -->
+    <div class="settings-panel">
+        <button class="settings-toggle btn btn-outline-light rounded-circle" id="settingsToggle">
+            ⚙️
+        </button>
+        
+        <div class="settings-content card bg-dark border-secondary" id="settingsContent" hidden>
+            <div class="card-body">
+                <h5 class="card-title text-light mb-3">Settings Test</h5>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="testCheck1" checked>
+                    <label class="form-check-label text-light" for="testCheck1">
+                        Show seconds
+                    </label>
+                </div>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="testCheck2">
+                    <label class="form-check-label text-light" for="testCheck2">
+                        24-hour format
+                    </label>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="testSelect" class="form-label text-light">Timezone</label>
+                    <select class="form-select form-select-sm bg-dark text-light border-secondary" id="testSelect">
+                        <option selected>Select timezone...</option>
+                        <option value="1">New York</option>
+                        <option value="2">London</option>
+                        <option value="3">Tokyo</option>
+                        <option value="4">Sydney</option>
+                        <option value="5">Paris</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="testRange" class="form-label text-light">
+                        Opacity: <span id="rangeValue">50%</span>
+                    </label>
+                    <input type="range" class="form-range" min="0" max="100" value="50" id="testRange">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="testFile" class="form-label text-light">Upload Background</label>
+                    <input type="file" class="form-control form-control-sm bg-dark text-light border-secondary" id="testFile" accept="image/*">
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary btn-sm">Add World Clock</button>
+                    <button class="btn btn-outline-danger btn-sm">Reset to Default</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Device Info -->
+    <div class="device-info">
+        <strong>Device Info:</strong><br>
+        Screen: <span id="screenInfo"></span><br>
+        Viewport: <span id="viewportInfo"></span><br>
+        User Agent: <span id="userAgent"></span>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Update device info
+        function updateDeviceInfo() {
+            document.getElementById('screenInfo').textContent = `${screen.width}x${screen.height}`;
+            document.getElementById('viewportInfo').textContent = `${window.innerWidth}x${window.innerHeight}`;
+            document.getElementById('userAgent').textContent = navigator.userAgent.substring(0, 50) + '...';
+        }
+        
+        updateDeviceInfo();
+        window.addEventListener('resize', updateDeviceInfo);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(updateDeviceInfo, 100);
+        });
+        
+        // Time display
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('timeDisplay').textContent = now.toLocaleTimeString();
+            document.getElementById('dateDisplay').textContent = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // Settings functionality
+        const settingsToggle = document.getElementById('settingsToggle');
+        const settingsContent = document.getElementById('settingsContent');
+        
+        settingsToggle.addEventListener('click', function() {
+            const isHidden = settingsContent.hidden;
+            settingsContent.hidden = !isHidden;
+            
+            // Ensure proper mobile positioning
+            if (!isHidden && window.innerWidth <= 768) {
+                settingsContent.style.position = 'fixed';
+                settingsContent.style.left = window.innerWidth <= 480 ? '0.5rem' : '1rem';
+                settingsContent.style.right = window.innerWidth <= 480 ? '0.5rem' : '1rem';
+                settingsContent.style.width = 'auto';
+                settingsContent.style.top = window.innerWidth <= 480 ? '3.5rem' : '4rem';
+                settingsContent.style.maxHeight = window.innerWidth <= 480 ? 'calc(100vh - 4rem)' : 'calc(100vh - 5rem)';
+            }
+            
+            console.log('Settings toggled:', !isHidden);
+            console.log('Viewport width:', window.innerWidth);
+            console.log('Settings content position:', {
+                position: settingsContent.style.position,
+                left: settingsContent.style.left,
+                right: settingsContent.style.right,
+                top: settingsContent.style.top,
+                maxHeight: settingsContent.style.maxHeight
+            });
+        });
+        
+        // Range slider
+        document.getElementById('testRange').addEventListener('input', function(e) {
+            document.getElementById('rangeValue').textContent = e.target.value + '%';
+        });
+        
+        // Close settings when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!settingsToggle.contains(e.target) && !settingsContent.contains(e.target)) {
+                settingsContent.hidden = true;
+            }
+        });
+        
+        console.log('Mobile settings test loaded');
+    </script>
+</body>
+</html>
