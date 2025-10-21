@@ -919,19 +919,19 @@
             // Update the display
             if (daysDiff === 0) {
                 // It's Christmas Day!
-                countdownElement.textContent = '🎄 Merry Christmas! 🎅';
+                countdownElement.innerHTML = '🎄 Merry Christmas! 🎅';
                 countdownElement.classList.add('christmas-day');
             } else if (daysDiff === 1) {
-                countdownElement.textContent = '🎄 Christmas is tomorrow! 🎁';
+                countdownElement.innerHTML = '🎄 Christmas is tomorrow! 🎁';
                 countdownElement.classList.remove('christmas-day');
             } else if (daysDiff <= 7) {
-                countdownElement.textContent = `🎄 ${daysDiff} days until Christmas! 🎁`;
+                countdownElement.innerHTML = `🎄 <span class="countdown-number">${daysDiff}</span> days until Christmas! 🎁`;
                 countdownElement.classList.remove('christmas-day');
             } else if (daysDiff <= 30) {
-                countdownElement.textContent = `🎄 ${daysDiff} days until Christmas 🎅`;
+                countdownElement.innerHTML = `🎄 <span class="countdown-number">${daysDiff}</span> days until Christmas 🎅`;
                 countdownElement.classList.remove('christmas-day');
             } else {
-                countdownElement.textContent = `🎄 ${daysDiff} days until Christmas`;
+                countdownElement.innerHTML = `🎄 <span class="countdown-number">${daysDiff}</span> days until Christmas`;
                 countdownElement.classList.remove('christmas-day');
             }
         }

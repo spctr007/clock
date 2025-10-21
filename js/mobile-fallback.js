@@ -77,12 +77,12 @@
         const daysUntil = Math.ceil(timeDiff / (1000 * 3600 * 24));
         
         if (daysUntil === 0) {
-            countdownElement.textContent = '🎄 Merry Christmas! 🎄';
+            countdownElement.innerHTML = '🎄 Merry Christmas! 🎄';
             countdownElement.className = 'countdown-text christmas-day';
         } else if (daysUntil === 1) {
-            countdownElement.textContent = '🎄 Christmas is tomorrow! 🎄';
+            countdownElement.innerHTML = '🎄 Christmas is tomorrow! 🎄';
         } else {
-            countdownElement.textContent = '🎄 ' + daysUntil + ' days until Christmas 🎄';
+            countdownElement.innerHTML = '🎄 <span class="countdown-number">' + daysUntil + '</span> days until Christmas 🎄';
         }
     }
     

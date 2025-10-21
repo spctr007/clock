@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Countdown Test</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 2rem;
+        }
+        
+        .christmas-countdown {
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .countdown-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(1rem, 3vw, 2rem);
+            font-weight: 600;
+            opacity: 1 !important;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
+            letter-spacing: 0.02em;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 11;
+        }
+
+        /* Christmas countdown number styling */
+        .countdown-number {
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 800;
+            color: #22c55e; /* Green color */
+            text-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.6),
+                0 0 15px rgba(34, 197, 94, 0.4),
+                0 0 30px rgba(34, 197, 94, 0.2);
+            display: inline-block;
+            margin: 0 0.25rem;
+            animation: countdownGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes countdownGlow {
+            from {
+                text-shadow: 
+                    0 2px 4px rgba(0, 0, 0, 0.6),
+                    0 0 15px rgba(34, 197, 94, 0.4),
+                    0 0 30px rgba(34, 197, 94, 0.2);
+                transform: scale(1);
+            }
+            to {
+                text-shadow: 
+                    0 2px 4px rgba(0, 0, 0, 0.6),
+                    0 0 20px rgba(34, 197, 94, 0.6),
+                    0 0 40px rgba(34, 197, 94, 0.3);
+                transform: scale(1.05);
+            }
+        }
+
+        .countdown-text:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+        }
+
+        .countdown-text.christmas-day {
+            color: #ff6b6b;
+            font-weight: 600;
+            animation: christmasGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes christmasGlow {
+            from {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 107, 107, 0.3);
+            }
+            to {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 107, 107, 0.6);
+            }
+        }
+        
+        .test-controls {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .test-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .test-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .info {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            opacity: 0.7;
+            text-align: center;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 480px) {
+            .countdown-text {
+                font-size: clamp(0.875rem, 3vw, 1.2rem);
+            }
+            
+            .countdown-number {
+                font-size: clamp(1.5rem, 8vw, 2.5rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Christmas Countdown Styling Test</h1>
+    
+    <div class="christmas-countdown">
+        <span class="countdown-text" id="countdownText">🎄 Loading...</span>
+    </div>
+    
+    <div class="test-controls">
+        <button class="test-button" onclick="testDays(365)">Test 365 Days</button>
+        <button class="test-button" onclick="testDays(100)">Test 100 Days</button>
+        <button class="test-button" onclick="testDays(25)">Test 25 Days</button>
+        <button class="test-button" onclick="testDays(7)">Test 7 Days</button>
+        <button class="test-button" onclick="testDays(1)">Test Tomorrow</button>
+        <button class="test-button" onclick="testDays(0)">Test Christmas Day</button>
+        <button class="test-button" onclick="updateRealCountdown()">Real Countdown</button>
+    </div>
+    
+    <div class="info">
+        <p>The number of days is now bigger and styled in green with a glowing animation.</p>
+        <p>Click the buttons above to test different countdown scenarios.</p>
+    </div>
+
+    <script>
+        function testDays(days) {
+            const countdownElement = document.getElementById('countdownText');
+            
+            if (days === 0) {
+                countdownElement.innerHTML = '🎄 Merry Christmas! 🎅';
+                countdownElement.classList.add('christmas-day');
+            } else if (days === 1) {
+                countdownElement.innerHTML = '🎄 Christmas is tomorrow! 🎁';
+                countdownElement.classList.remove('christmas-day');
+            } else if (days <= 7) {
+                countdownElement.innerHTML = `🎄 <span class="countdown-number">${days}</span> days until Christmas! 🎁`;
+                countdownElement.classList.remove('christmas-day');
+            } else if (days <= 30) {
+                countdownElement.innerHTML = `🎄 <span class="countdown-number">${days}</span> days until Christmas 🎅`;
+                countdownElement.classList.remove('christmas-day');
+            } else {
+                countdownElement.innerHTML = `🎄 <span class="countdown-number">${days}</span> days until Christmas`;
+                countdownElement.classList.remove('christmas-day');
+            }
+        }
+        
+        function updateRealCountdown() {
+            const countdownElement = document.getElementById('countdownText');
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            
+            let christmas = new Date(currentYear, 11, 25);
+            if (now > christmas) {
+                christmas = new Date(currentYear + 1, 11, 25);
+            }
+            
+            const timeDiff = christmas.getTime() - now.getTime();
+            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            
+            testDays(daysDiff);
+        }
+        
+        // Initialize with real countdown
+        updateRealCountdown();
+        
+        console.log('Christmas countdown test loaded');
+    </script>
+</body>
+</html>
