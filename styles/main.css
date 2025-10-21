@@ -248,8 +248,9 @@ button {
 .countdown-number {
     font-size: clamp(2rem, 6vw, 4rem);
     font-weight: 800;
-    color: #22c55e; /* Green color */
-    text-shadow: 
+    color: #22c55e;
+    /* Green color */
+    text-shadow:
         0 2px 4px rgba(0, 0, 0, 0.6),
         0 0 15px rgba(34, 197, 94, 0.4),
         0 0 30px rgba(34, 197, 94, 0.2);
@@ -260,14 +261,15 @@ button {
 
 @keyframes countdownGlow {
     from {
-        text-shadow: 
+        text-shadow:
             0 2px 4px rgba(0, 0, 0, 0.6),
             0 0 15px rgba(34, 197, 94, 0.4),
             0 0 30px rgba(34, 197, 94, 0.2);
         transform: scale(1);
     }
+
     to {
-        text-shadow: 
+        text-shadow:
             0 2px 4px rgba(0, 0, 0, 0.6),
             0 0 20px rgba(34, 197, 94, 0.6),
             0 0 40px rgba(34, 197, 94, 0.3);
@@ -440,7 +442,8 @@ button {
 
 /* Settings Panel - Bootstrap Only */
 .settings-panel {
-    z-index: 1060 !important; /* Higher than Bootstrap modals */
+    z-index: 1060 !important;
+    /* Higher than Bootstrap modals */
     animation: fadeInUp 1s ease 0.5s both;
 }
 
@@ -1163,25 +1166,28 @@ button {
 /* Mobile-first responsive design */
 /* Touch-friendly interactions */
 @media (hover: none) and (pointer: coarse) {
+
     /* Mobile touch devices */
     .settings-toggle {
         width: 4rem;
         height: 4rem;
         font-size: 1.5rem;
     }
-    
+
     .setting-checkbox {
         width: 1.5rem;
         height: 1.5rem;
     }
-    
+
     .world-clock-remove {
         padding: 0.5rem;
         font-size: 1.25rem;
     }
-    
+
     /* Increase touch targets */
-    button, .setting-label, .upload-label {
+    button,
+    .setting-label,
+    .upload-label {
         min-height: 44px;
         min-width: 44px;
     }
@@ -1218,27 +1224,27 @@ button {
     .date-display {
         margin-bottom: 1.5rem;
     }
-    
+
     /* Better mobile font scaling */
     .time-text {
         font-size: clamp(6rem, 25vw, 12rem) !important;
     }
-    
+
     .ampm-text {
         font-size: clamp(1.2rem, 5vw, 2rem);
     }
-    
+
     .date-text {
         font-size: clamp(1rem, 4vw, 1.4rem);
     }
-    
+
     /* Mobile world clocks */
     .world-clocks-container {
         grid-template-columns: 1fr;
         gap: 1rem;
         padding: 0 1rem;
     }
-    
+
     .world-clock-display {
         min-width: auto;
         width: 100%;
@@ -1249,7 +1255,8 @@ button {
     .app-container {
         padding: 0.5rem;
         min-height: 100vh;
-        min-height: 100dvh; /* Dynamic viewport height for mobile */
+        min-height: 100dvh;
+        /* Dynamic viewport height for mobile */
     }
 
     .error-message {
@@ -1275,37 +1282,37 @@ button {
         margin-top: -0.5rem;
         margin-left: 0;
     }
-    
+
     /* Extra small mobile adjustments */
     .time-text {
         font-size: clamp(4rem, 20vw, 8rem) !important;
         padding: 0.5rem 1rem;
     }
-    
+
     .date-text {
         font-size: clamp(0.875rem, 3.5vw, 1.2rem);
         padding: 0.5rem 1rem;
     }
-    
+
     .countdown-text {
         font-size: clamp(0.875rem, 3vw, 1.2rem);
     }
-    
+
     .countdown-number {
         font-size: clamp(1.5rem, 8vw, 2.5rem);
     }
-    
+
     /* Mobile settings adjustments */
     .settings-toggle {
         width: 3rem;
         height: 3rem;
         font-size: 1rem;
     }
-    
+
     .setting-item {
         margin-bottom: 1rem;
     }
-    
+
     .setting-label {
         font-size: 0.875rem;
         padding: 0.75rem 0;
@@ -1794,9 +1801,11 @@ d Timezone Selector Styles */
         transform: none;
     }
 }
+
 /* Mob
 ile touch optimizations */
 @media (pointer: coarse) {
+
     /* Increase touch targets for mobile */
     .settings-toggle,
     .world-clock-remove,
@@ -1806,12 +1815,14 @@ ile touch optimizations */
         -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
         touch-action: manipulation;
     }
-    
+
     /* Prevent zoom on input focus */
-    input, select, textarea {
+    input,
+    select,
+    textarea {
         font-size: 16px !important;
     }
-    
+
     /* Better mobile scrolling */
     .settings-content {
         -webkit-overflow-scrolling: touch;
@@ -1825,7 +1836,7 @@ ile touch optimizations */
         height: 100vh;
         height: -webkit-fill-available;
     }
-    
+
     /* Fix iOS viewport height issues */
     body {
         height: 100vh;
@@ -1845,11 +1856,11 @@ ile touch optimizations */
     .app-container {
         padding: 0.5rem;
     }
-    
+
     .time-text {
         font-size: clamp(3rem, 15vw, 6rem) !important;
     }
-    
+
     .settings-content {
         max-height: 50vh;
         max-height: 50dvh;
@@ -1861,13 +1872,15 @@ ile touch optimizations */
     .time-text {
         font-size: clamp(3rem, 18vw, 5rem) !important;
     }
-    
+
     .settings-content {
         width: calc(100vw - 1rem);
         right: -0.5rem;
         left: 0.5rem;
     }
-}/*
+}
+
+/*
  Bootstrap Component Overrides */
 
 /* Form controls in dark theme */
@@ -2008,16 +2021,16 @@ ile touch optimizations */
         max-height: calc(100vh - 3.5rem) !important;
         max-height: calc(100dvh - 3.5rem) !important;
     }
-    
+
     .world-clocks-container .col-12 {
         margin-bottom: 1rem;
     }
-    
+
     .time-display {
         flex-direction: column !important;
         align-items: center !important;
     }
-    
+
     .ampm-text {
         margin-left: 0 !important;
         margin-top: -0.5rem;
@@ -2039,7 +2052,9 @@ ile touch optimizations */
 
 .border-secondary {
     border-color: rgba(255, 255, 255, 0.15) !important;
-}/* Boots
+}
+
+/* Boots
 trap Offcanvas Overrides for Mobile Settings */
 .offcanvas.offcanvas-end {
     width: 90vw;
@@ -2094,11 +2109,11 @@ trap Offcanvas Overrides for Mobile Settings */
     .offcanvas.d-md-none {
         display: none !important;
     }
-    
+
     .settings-toggle[data-bs-toggle="offcanvas"] {
         pointer-events: none;
     }
-    
+
     .settings-toggle:not([data-bs-toggle]) {
         pointer-events: auto;
     }
