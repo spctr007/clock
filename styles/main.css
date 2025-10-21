@@ -464,27 +464,13 @@ button {
     overflow-y: auto;
 }
 
-/* Mobile-specific settings content positioning */
-@media (max-width: 768px) {
+/* Desktop settings content positioning */
+@media (min-width: 768px) {
     .settings-content {
-        position: fixed;
-        top: 4rem;
-        right: 1rem;
-        left: 1rem;
-        width: auto;
-        max-height: calc(100vh - 5rem);
-        max-height: calc(100dvh - 5rem);
-        border-radius: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .settings-content {
-        top: 3.5rem;
-        right: 0.5rem;
-        left: 0.5rem;
-        max-height: calc(100vh - 4rem);
-        max-height: calc(100dvh - 4rem);
+        position: absolute;
+        top: 4.5rem;
+        right: 0;
+        width: 320px;
     }
 }
 
@@ -2038,4 +2024,67 @@ ile touch optimizations */
 
 .border-secondary {
     border-color: rgba(255, 255, 255, 0.15) !important;
+}/* Boots
+trap Offcanvas Overrides for Mobile Settings */
+.offcanvas.offcanvas-end {
+    width: 90vw;
+    max-width: 400px;
+    background: rgba(0, 0, 0, 0.95) !important;
+    backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.offcanvas-header.bg-dark {
+    background: rgba(0, 0, 0, 0.9) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.offcanvas-body.bg-dark {
+    background: rgba(0, 0, 0, 0.95) !important;
+}
+
+.offcanvas-title {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+}
+
+/* Ensure mobile settings have proper spacing */
+.offcanvas-body .settings-group {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.offcanvas-body .settings-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* Mobile settings responsive adjustments */
+@media (max-width: 576px) {
+    .offcanvas.offcanvas-end {
+        width: 95vw;
+    }
+}
+
+/* Hide desktop settings on mobile, show offcanvas trigger */
+@media (max-width: 767.98px) {
+    .settings-content.d-none.d-md-block {
+        display: none !important;
+    }
+}
+
+/* Hide offcanvas trigger on desktop, show desktop settings */
+@media (min-width: 768px) {
+    .offcanvas.d-md-none {
+        display: none !important;
+    }
+    
+    .settings-toggle[data-bs-toggle="offcanvas"] {
+        pointer-events: none;
+    }
+    
+    .settings-toggle:not([data-bs-toggle]) {
+        pointer-events: auto;
+    }
 }

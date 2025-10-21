@@ -48,12 +48,16 @@
         </div>
 
         <aside class="settings-panel position-fixed" id="settingsPanel" aria-label="Time display settings">
-            <button class="settings-toggle btn btn-outline-light rounded-circle" id="settingsToggle" aria-expanded="false" aria-controls="settingsContent">
+            <button class="settings-toggle btn btn-outline-light rounded-circle" id="settingsToggle" 
+                    data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" 
+                    aria-controls="settingsOffcanvas" aria-expanded="false">
                 <span class="visually-hidden">Toggle settings</span>
                 <span class="settings-icon">⚙️</span>
             </button>
+        </aside>
 
-            <div class="settings-content card bg-dark border-secondary" id="settingsContent" hidden>
+        <!-- Desktop Settings Panel -->
+        <div class="settings-content card bg-dark border-secondary d-none d-md-block" id="settingsContent" hidden>
                 <div class="card-body">
                     <div class="settings-group mb-4">
                         <h5 class="settings-title card-title text-light mb-3">Display Settings</h5>
@@ -158,6 +162,17 @@
             </div>
         </section>
     </main>
+
+    <!-- Mobile Settings Offcanvas -->
+    <div class="offcanvas offcanvas-end d-md-none" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
+        <div class="offcanvas-header bg-dark border-bottom border-secondary">
+            <h5 class="offcanvas-title text-light" id="settingsOffcanvasLabel">Settings</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body bg-dark" id="mobileSettingsContent">
+            <!-- Mobile settings content will be populated by JavaScript -->
+        </div>
+    </div>
 
     <!-- Error Toast -->
     <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3">
@@ -390,76 +405,154 @@
         function setupSettings() {
             const settingsToggle = document.getElementById('settingsToggle');
             const settingsContent = document.getElementById('settingsContent');
+            const mobileSettingsContent = document.getElementById('mobileSettingsContent');
             const showSecondsCheckbox = document.getElementById('showSeconds');
             const use24HourCheckbox = document.getElementById('use24Hour');
 
-            // Settings panel toggle
-            if (settingsToggle && settingsContent) {
+            // Populate mobile settings content
+            if (mobileSettingsContent && settingsContent) {
+                // Clone the desktop settings content for mobile
+                const desktopContent = settingsContent.querySelector('.card-body');
+                if (desktopContent) {
+                    mobileSettingsContent.innerHTML = desktopContent.innerHTML;
+                }
+            }
+
+            // Desktop settings panel toggle (for screens >= md)
+            if (settingsToggle && settingsContent && window.innerWidth >= 768) {
+                // Remove Bootstrap attributes for desktop
+                settingsToggle.removeAttribute('data-bs-toggle');
+                settingsToggle.removeAttribute('data-bs-target');
+                
                 settingsToggle.addEventListener('click', function () {
                     const isHidden = settingsContent.hidden;
                     settingsContent.hidden = !isHidden;
                     settingsToggle.setAttribute('aria-expanded', !isHidden);
-                    
-                    // Ensure proper mobile positioning when opened
-                    if (!isHidden && window.innerWidth <= 768) {
-                        settingsContent.style.position = 'fixed';
-                        settingsContent.style.left = '1rem';
-                        settingsContent.style.right = '1rem';
-                        settingsContent.style.width = 'auto';
-                        settingsContent.style.top = '4rem';
-                        settingsContent.style.maxHeight = 'calc(100vh - 5rem)';
+                    console.log('Desktop settings panel toggled:', !isHidden);
+                });
+            }
+
+            // Sync settings between desktop and mobile panels
+            function syncSettings() {
+                const desktopCheckboxes = settingsContent ? settingsContent.querySelectorAll('input[type="checkbox"], input[type="range"], select') : [];
+                const mobileCheckboxes = mobileSettingsContent ? mobileSettingsContent.querySelectorAll('input[type="checkbox"], input[type="range"], select') : [];
+                
+                // Sync from desktop to mobile
+                desktopCheckboxes.forEach(input => {
+                    const mobileInput = mobileSettingsContent ? mobileSettingsContent.querySelector(`#${input.id}`) : null;
+                    if (mobileInput) {
+                        if (input.type === 'checkbox') {
+                            mobileInput.checked = input.checked;
+                        } else {
+                            mobileInput.value = input.value;
+                        }
                     }
-                    
-                    console.log('Settings panel toggled:', !isHidden);
+                });
+                
+                // Sync from mobile to desktop
+                mobileCheckboxes.forEach(input => {
+                    const desktopInput = settingsContent ? settingsContent.querySelector(`#${input.id}`) : null;
+                    if (desktopInput) {
+                        if (input.type === 'checkbox') {
+                            desktopInput.checked = input.checked;
+                        } else {
+                            desktopInput.value = input.value;
+                        }
+                    }
                 });
             }
 
-            // Show seconds checkbox
-            if (showSecondsCheckbox) {
-                showSecondsCheckbox.addEventListener('change', function () {
-                    showSeconds = this.checked;
-                    saveSettings();
-                    console.log('Show seconds changed to:', showSeconds);
-                });
-            }
-
-            // 24-hour format checkbox
-            if (use24HourCheckbox) {
-                use24HourCheckbox.addEventListener('change', function () {
-                    use24Hour = this.checked;
-                    saveSettings();
-                    console.log('24-hour format changed to:', use24Hour);
-                });
-            }
-            
-            // Show world clocks checkbox
-            const showWorldClocksCheckbox = document.getElementById('showWorldClocks');
-            if (showWorldClocksCheckbox) {
-                showWorldClocksCheckbox.addEventListener('change', function() {
-                    showWorldClocks = this.checked;
-                    saveSettings();
-                    updateWorldClockDisplay();
-                    console.log('Show world clocks changed to:', showWorldClocks);
-                });
-            }
-            
-            // Timezone selector and add button
-            const timezoneSelect = document.getElementById('timezoneSelect');
-            const addWorldClockBtn = document.getElementById('addWorldClockBtn');
-            
-            if (timezoneSelect) {
-                timezoneSelect.addEventListener('change', function() {
-                    if (addWorldClockBtn) {
+            // Add event listeners to both desktop and mobile settings
+            function addSettingsListeners(container) {
+                if (!container) return;
+                
+                const showSecondsCheck = container.querySelector('#showSeconds');
+                const use24HourCheck = container.querySelector('#use24Hour');
+                const showWorldClocksCheck = container.querySelector('#showWorldClocks');
+                const timezoneSelect = container.querySelector('#timezoneSelect');
+                const addWorldClockBtn = container.querySelector('#addWorldClockBtn');
+                const opacitySlider = container.querySelector('#opacitySlider');
+                const backgroundUpload = container.querySelector('#backgroundUpload');
+                const resetButton = container.querySelector('#resetBackground');
+                
+                if (showSecondsCheck) {
+                    showSecondsCheck.addEventListener('change', function () {
+                        showSeconds = this.checked;
+                        syncSettings();
+                        saveSettings();
+                    });
+                }
+                
+                if (use24HourCheck) {
+                    use24HourCheck.addEventListener('change', function () {
+                        use24Hour = this.checked;
+                        syncSettings();
+                        saveSettings();
+                    });
+                }
+                
+                if (showWorldClocksCheck) {
+                    showWorldClocksCheck.addEventListener('change', function() {
+                        showWorldClocks = this.checked;
+                        syncSettings();
+                        saveSettings();
+                        updateWorldClockDisplay();
+                    });
+                }
+                
+                if (timezoneSelect && addWorldClockBtn) {
+                    timezoneSelect.addEventListener('change', function() {
                         addWorldClockBtn.disabled = !this.value;
-                    }
-                });
+                        // Sync the other select
+                        const otherSelect = container === settingsContent ? 
+                            mobileSettingsContent?.querySelector('#timezoneSelect') : 
+                            settingsContent?.querySelector('#timezoneSelect');
+                        if (otherSelect) {
+                            otherSelect.value = this.value;
+                        }
+                    });
+                    
+                    addWorldClockBtn.addEventListener('click', function() {
+                        addWorldClock();
+                        syncSettings();
+                    });
+                }
+                
+                if (opacitySlider) {
+                    opacitySlider.addEventListener('input', function(e) {
+                        backgroundOpacity = parseInt(e.target.value) / 100;
+                        updateBackgroundOpacity();
+                        syncSettings();
+                        saveSettings();
+                        
+                        // Update opacity display
+                        const opacityValue = container.querySelector('#opacityValue');
+                        if (opacityValue) {
+                            opacityValue.textContent = e.target.value + '%';
+                        }
+                    });
+                }
+                
+                if (backgroundUpload) {
+                    backgroundUpload.addEventListener('change', function(e) {
+                        handleBackgroundUpload(e);
+                    });
+                }
+                
+                if (resetButton) {
+                    resetButton.addEventListener('click', function() {
+                        resetBackground();
+                        syncSettings();
+                    });
+                }
             }
-            
-            if (addWorldClockBtn) {
-                addWorldClockBtn.addEventListener('click', function() {
-                    addWorldClock();
-                });
-            }
+
+            // Add listeners to both panels
+            addSettingsListeners(settingsContent);
+            addSettingsListeners(mobileSettingsContent);
+
+            // Legacy checkbox references (now handled by addSettingsListeners)
+            // Keeping for backward compatibility but functionality moved to unified handler
             
             // Background upload functionality
             const backgroundUpload = document.getElementById('backgroundUpload');

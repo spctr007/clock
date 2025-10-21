@@ -197,18 +197,26 @@
         
         // Touch event handling for mobile
         if (isMobile) {
-            settingsToggle.addEventListener('touchstart', function(e) {
-                e.preventDefault();
-                this.click();
-            });
-            
-            // Ensure settings panel is properly positioned on mobile
-            if (settingsContent) {
-                settingsContent.style.position = 'fixed';
-                settingsContent.style.left = '0.5rem';
-                settingsContent.style.right = '0.5rem';
-                settingsContent.style.width = 'auto';
-                settingsContent.style.maxHeight = 'calc(100vh - 4rem)';
+            // For mobile, we'll use a simple modal-like approach if Bootstrap isn't available
+            if (!window.bootstrap) {
+                settingsToggle.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    this.click();
+                });
+                
+                // Create a simple mobile settings overlay
+                if (settingsContent) {
+                    settingsContent.style.position = 'fixed';
+                    settingsContent.style.top = '2rem';
+                    settingsContent.style.left = '1rem';
+                    settingsContent.style.right = '1rem';
+                    settingsContent.style.bottom = '2rem';
+                    settingsContent.style.width = 'auto';
+                    settingsContent.style.maxHeight = 'none';
+                    settingsContent.style.zIndex = '9999';
+                    settingsContent.style.borderRadius = '12px';
+                    settingsContent.style.overflow = 'auto';
+                }
             }
         }
     }

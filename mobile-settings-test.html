@@ -6,7 +6,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Mobile Settings Test</title>
+    <title>Bootstrap Offcanvas Settings Test</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -116,12 +116,23 @@
     </div>
     
     <!-- Settings Panel -->
-    <div class="settings-panel">
-        <button class="settings-toggle btn btn-outline-light rounded-circle" id="settingsToggle">
+    <div class="settings-panel position-fixed" style="top: 1rem; right: 1rem; z-index: 1050;">
+        <!-- Desktop Settings Button -->
+        <button class="settings-toggle btn btn-outline-light rounded-circle d-none d-md-block" id="desktopSettingsToggle">
             ⚙️
         </button>
         
-        <div class="settings-content card bg-dark border-secondary" id="settingsContent" hidden>
+        <!-- Mobile Settings Button -->
+        <button class="settings-toggle btn btn-outline-light rounded-circle d-md-none" 
+                data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas">
+            ⚙️
+        </button>
+    </div>
+    
+    <!-- Desktop Settings Panel -->
+    <div class="settings-content card bg-dark border-secondary d-none d-md-block position-absolute" 
+         id="settingsContent" 
+         style="top: 5rem; right: 1rem; width: 320px; display: none; z-index: 1040;">
             <div class="card-body">
                 <h5 class="card-title text-light mb-3">Settings Test</h5>
                 
@@ -170,6 +181,73 @@
             </div>
         </div>
     </div>
+
+    <!-- Mobile Settings Offcanvas -->
+    <div class="offcanvas offcanvas-end d-md-none" tabindex="-1" id="settingsOffcanvas" 
+         style="width: 90vw; max-width: 400px; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);">
+        <div class="offcanvas-header" style="background: rgba(0,0,0,0.9); border-bottom: 1px solid rgba(255,255,255,0.15);">
+            <h5 class="offcanvas-title text-light">Settings</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body" style="background: rgba(0,0,0,0.95);">
+            <div class="mb-4">
+                <h6 class="text-light mb-3">Display Settings</h6>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="mobileShowSeconds" checked>
+                    <label class="form-check-label text-light" for="mobileShowSeconds">
+                        Show seconds
+                    </label>
+                </div>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="mobile24Hour">
+                    <label class="form-check-label text-light" for="mobile24Hour">
+                        24-hour format
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <h6 class="text-light mb-3">World Clocks</h6>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="mobileShowWorldClocks">
+                    <label class="form-check-label text-light" for="mobileShowWorldClocks">
+                        Show world clocks
+                    </label>
+                </div>
+                
+                <div class="mb-3">
+                    <select class="form-select form-select-sm" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                        <option>Select timezone...</option>
+                        <option>New York</option>
+                        <option>London</option>
+                        <option>Tokyo</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-outline-primary btn-sm w-100 mb-3">Add World Clock</button>
+            </div>
+            
+            <div>
+                <h6 class="text-light mb-3">Background</h6>
+                
+                <div class="mb-3">
+                    <label class="form-label text-light">Upload Background</label>
+                    <input type="file" class="form-control form-control-sm" 
+                           style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label text-light">Opacity: <span>50%</span></label>
+                    <input type="range" class="form-range" min="0" max="100" value="50">
+                </div>
+                
+                <button class="btn btn-outline-danger btn-sm w-100">Reset to Default</button>
+            </div>
+        </div>
+    </div>
     
     <!-- Device Info -->
     <div class="device-info">
@@ -212,33 +290,33 @@
         setInterval(updateTime, 1000);
         
         // Settings functionality
-        const settingsToggle = document.getElementById('settingsToggle');
+        const desktopSettingsToggle = document.getElementById('desktopSettingsToggle');
         const settingsContent = document.getElementById('settingsContent');
         
-        settingsToggle.addEventListener('click', function() {
-            const isHidden = settingsContent.hidden;
-            settingsContent.hidden = !isHidden;
-            
-            // Ensure proper mobile positioning
-            if (!isHidden && window.innerWidth <= 768) {
-                settingsContent.style.position = 'fixed';
-                settingsContent.style.left = window.innerWidth <= 480 ? '0.5rem' : '1rem';
-                settingsContent.style.right = window.innerWidth <= 480 ? '0.5rem' : '1rem';
-                settingsContent.style.width = 'auto';
-                settingsContent.style.top = window.innerWidth <= 480 ? '3.5rem' : '4rem';
-                settingsContent.style.maxHeight = window.innerWidth <= 480 ? 'calc(100vh - 4rem)' : 'calc(100vh - 5rem)';
-            }
-            
-            console.log('Settings toggled:', !isHidden);
-            console.log('Viewport width:', window.innerWidth);
-            console.log('Settings content position:', {
-                position: settingsContent.style.position,
-                left: settingsContent.style.left,
-                right: settingsContent.style.right,
-                top: settingsContent.style.top,
-                maxHeight: settingsContent.style.maxHeight
+        // Desktop settings toggle
+        if (desktopSettingsToggle && settingsContent) {
+            desktopSettingsToggle.addEventListener('click', function() {
+                const isHidden = settingsContent.style.display === 'none' || !settingsContent.style.display;
+                settingsContent.style.display = isHidden ? 'block' : 'none';
+                console.log('Desktop settings toggled:', isHidden);
             });
-        });
+        }
+        
+        // Test offcanvas events
+        const settingsOffcanvas = document.getElementById('settingsOffcanvas');
+        if (settingsOffcanvas) {
+            settingsOffcanvas.addEventListener('show.bs.offcanvas', function() {
+                console.log('Mobile offcanvas opening');
+            });
+            
+            settingsOffcanvas.addEventListener('shown.bs.offcanvas', function() {
+                console.log('Mobile offcanvas opened');
+            });
+            
+            settingsOffcanvas.addEventListener('hide.bs.offcanvas', function() {
+                console.log('Mobile offcanvas closing');
+            });
+        }
         
         // Range slider
         document.getElementById('testRange').addEventListener('input', function(e) {
