@@ -1,0 +1,23 @@
+{
+  "name": "time-display-webapp",
+  "version": "1.0.0",
+  "description": "A web application that displays current time with NTP synchronization",
+  "type": "module",
+  "scripts": {
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:ntp": "vitest js/tests/NTPService.test.js --run",
+    "test:ntp:watch": "vitest js/tests/NTPService.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@vitest/ui": "^3.2.4",
+    "jsdom": "^27.0.0",
+    "vitest": "^3.2.4"
+  },
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

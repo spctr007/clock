@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Time Display</title>
+</head>
+<body>
+    <div id="timeText">Loading...</div>
+    <div id="dateText">Loading...</div>
+    <div id="debug">Debug info will appear here</div>
+
+    <script type="module">
+        console.log('Debug script starting...');
+        
+        // Simple time display
+        function updateTime() {
+            const now = new Date();
+            const timeElement = document.getElementById('timeText');
+            const dateElement = document.getElementById('dateText');
+            const debugElement = document.getElementById('debug');
+            
+            if (timeElement) {
+                timeElement.textContent = now.toLocaleTimeString();
+            }
+            
+            if (dateElement) {
+                dateElement.textContent = now.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+            
+            if (debugElement) {
+                debugElement.innerHTML = `
+                    <p>Time: ${now.toLocaleTimeString()}</p>
+                    <p>Date: ${now.toLocaleDateString()}</p>
+                    <p>Timestamp: ${now.getTime()}</p>
+                `;
+            }
+        }
+        
+        // Test if basic functionality works
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        console.log('Basic time display started');
+        
+        // Now test importing the main app
+        try {
+            console.log('Attempting to import main app...');
+            const { default: App } = await import('./js/main.js');
+            console.log('Main app imported successfully');
+        } catch (error) {
+            console.error('Failed to import main app:', error);
+            document.getElementById('debug').innerHTML += `<p style="color: red;">Import error: ${error.message}</p>`;
+        }
+    </script>
+</body>
+</html>

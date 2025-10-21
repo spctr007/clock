@@ -1,0 +1,1716 @@
+/* CSS Reset and Base Styles */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
+
+body {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Remove default button and input styles */
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    border: none;
+    background: none;
+    outline: none;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* Accessibility helpers */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Main App Container - time.is inspired layout */
+.app-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid-template-rows: 1fr auto auto;
+    grid-template-areas:
+        "main"
+        "world-clocks"
+        "footer";
+    justify-items: center;
+    align-content: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background-attachment: fixed;
+    background-size: 400% 400%;
+    animation: gradientShift 20s ease infinite;
+    overflow: hidden;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+}
+
+/* Subtle gradient animation for default background - time.is inspired */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    25% {
+        background-position: 100% 50%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+
+    75% {
+        background-position: 0% 100%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Smooth hover animations for interactive elements */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Background Overlay */
+.background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+}
+
+/* Time Display Section - time.is inspired */
+.time-display-section {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 0 1rem;
+}
+
+.time-display {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.time-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(10rem, 30vw, 19rem) !important;
+    line-height: 0.9;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
+    font-variant-numeric: tabular-nums;
+    color: #ffffff;
+    transition: all 0.3s ease;
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.0);
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 11;
+}
+
+.time-text:hover {
+    transform: scale(1.02);
+    text-shadow: 0 6px 12px rgba(0, 0, 0, 0.0);
+}
+
+.ampm-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(1.5rem, 6vw, 3rem);
+    font-weight: 800;
+    opacity: 1 !important;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    transition: all 0.3s ease;
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.0);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 11;
+    margin-left: 1rem;
+}
+
+/* Date Display - time.is inspired */
+.date-display {
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.date-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    font-weight: 400;
+    opacity: 1 !important;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.02em;
+    color: #ffffff;
+    transition: all 0.3s ease;
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.0);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 11;
+}
+
+.date-text:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+/* Christmas Countdown */
+.christmas-countdown {
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 10;
+    text-align: center;
+}
+
+.countdown-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(1rem, 3vw, 5rem);
+    font-weight: 600;
+    opacity: 1 !important;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.02em;
+    color: #ffffff;
+    transition: all 0.3s ease;
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 11;
+}
+
+.countdown-text:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+.countdown-text.christmas-day {
+    color: #ff6b6b;
+    font-weight: 600;
+    animation: christmasGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes christmasGlow {
+    from {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 107, 107, 0.3);
+    }
+
+    to {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 107, 107, 0.6);
+    }
+}
+
+/* World Clocks Section - time.is inspired layout */
+.world-clocks-section {
+    position: relative;
+    z-index: 2;
+    grid-area: world-clocks;
+    width: 100%;
+    max-width: 1200px;
+    margin: 2rem 0;
+    animation: fadeInUp 0.8s ease 0.3s both;
+}
+
+.world-clocks-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 0 2rem;
+    justify-items: center;
+}
+
+.world-clock-display {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    min-width: 260px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.world-clock-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.world-clock-display:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-4px) scale(1.02);
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.world-clock-display:hover::before {
+    left: 100%;
+}
+
+.world-clock-city-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.9;
+    transition: all 0.3s ease;
+}
+
+.world-clock-time {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 300;
+    color: #ffffff;
+    margin-bottom: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    letter-spacing: -0.02em;
+    transition: all 0.3s ease;
+}
+
+.world-clock-date {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.875rem;
+    color: #ffffff;
+    opacity: 0.7;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    transition: opacity 0.3s ease;
+}
+
+.world-clock-display:hover .world-clock-city-name {
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+.world-clock-display:hover .world-clock-time {
+    transform: scale(1.05);
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.world-clock-display:hover .world-clock-date {
+    opacity: 0.9;
+}
+
+/* Connection Status - time.is inspired */
+.connection-status {
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fadeInUp 0.6s ease;
+}
+
+.connection-status:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #fbbf24;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+    animation: pulse 2s infinite;
+}
+
+.status-indicator.connected {
+    background-color: #10b981;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    animation: none;
+}
+
+.status-indicator.disconnected {
+    background-color: #ef4444;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+    animation: pulse 1s infinite;
+}
+
+/* Settings Panel - time.is inspired minimalist design */
+.settings-panel {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 10;
+    animation: fadeInUp 1s ease 0.5s both;
+}
+
+.settings-toggle {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.settings-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.1) rotate(90deg);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.settings-toggle:active {
+    transform: scale(1.05) rotate(90deg);
+}
+
+.settings-content {
+    position: absolute;
+    top: 4.5rem;
+    right: 0;
+    width: 320px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(30px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 2rem;
+    transform: translateY(-20px) scale(0.95);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.settings-content:not([hidden]) {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Custom scrollbar for settings content */
+.settings-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.settings-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.settings-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.settings-group {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    animation: fadeInUp 0.5s ease both;
+}
+
+.settings-group:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.settings-group:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.settings-group:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.settings-group:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.settings-title {
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: 1.25rem;
+    color: #ffffff;
+    opacity: 0.9;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+}
+
+.setting-item {
+    margin-bottom: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.setting-item:last-child {
+    margin-bottom: 0;
+}
+
+.setting-item:hover {
+    transform: translateX(4px);
+}
+
+.setting-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #ffffff;
+    opacity: 0.85;
+    transition: all 0.3s ease;
+    padding: 0.5rem 0;
+}
+
+.setting-label:hover {
+    opacity: 1;
+}
+
+.setting-checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+}
+
+.setting-checkbox:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+.setting-checkbox:checked {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border-color: #3b82f6;
+    transform: scale(1.05);
+}
+
+.setting-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -1px;
+    left: 2px;
+    color: #ffffff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    animation: checkmark 0.3s ease;
+}
+
+@keyframes checkmark {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* File Upload - time.is inspired clean button */
+.upload-label {
+    display: block;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 300;
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-label::before {
+    content: '📁';
+    display: block;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.upload-label:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.upload-label:hover::before {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.file-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Opacity Slider - time.is inspired clean design */
+.opacity-slider {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    outline: none;
+    margin: 1rem 0 0.75rem 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.opacity-slider:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.opacity-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.opacity-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+}
+
+.opacity-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.opacity-slider::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+}
+
+.opacity-value {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: right;
+    font-weight: 300;
+}
+
+/* World Clock Settings */
+.world-clock-settings {
+    margin-top: 1rem;
+}
+
+.world-clock-list {
+    margin-bottom: 1rem;
+}
+
+.world-clock-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.world-clock-info {
+    flex: 1;
+}
+
+.world-clock-city {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.world-clock-timezone {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.world-clock-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.world-clock-toggle {
+    width: 2rem;
+    height: 1rem;
+    background: #374151;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.world-clock-toggle.enabled {
+    background: #3b82f6;
+}
+
+.world-clock-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 0.75rem;
+    height: 0.75rem;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+.world-clock-toggle.enabled::after {
+    transform: translateX(1rem);
+}
+
+.world-clock-remove {
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+}
+
+.world-clock-remove:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.add-world-clock {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.timezone-select {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 300;
+}
+
+.timezone-select:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.timezone-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.timezone-select option {
+    background: #1a1a2e;
+    color: #ffffff;
+    padding: 0.5rem;
+}
+
+.add-clock-button {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    color: rgba(59, 130, 246, 0.9);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 300;
+}
+
+.add-clock-button:hover:not(:disabled) {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.5);
+    color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.add-clock-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Reset Button - time.is inspired subtle design */
+.reset-button {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    color: rgba(239, 68, 68, 0.9);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 300;
+    margin-top: 1rem;
+}
+
+.reset-button:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #ef4444;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.reset-button:active {
+    transform: translateY(0);
+}
+
+/* Enhanced Error Messages */
+.error-message {
+    position: fixed;
+    top: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(239, 68, 68, 0.95);
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 20;
+    max-width: 90vw;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: errorSlideIn 0.3s ease-out;
+}
+
+/* Ensure hidden attribute works properly for all elements */
+[hidden] {
+    display: none !important;
+}
+
+/* Specific rule for error message */
+.error-message[hidden] {
+    display: none !important;
+}
+
+.error-message.error-warning {
+    background: rgba(245, 158, 11, 0.95);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.error-message.error-info {
+    background: rgba(59, 130, 246, 0.95);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.error-message.error-success {
+    background: rgba(16, 185, 129, 0.95);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.error-message.error-critical {
+    background: rgba(220, 38, 38, 0.98);
+    border-color: rgba(220, 38, 38, 0.5);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
+}
+
+@keyframes errorSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.error-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.error-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Enhanced Connection Status */
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6b7280;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.status-indicator.connected {
+    background: #10b981;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.status-indicator.connected::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.3);
+    animation: pulse 2s infinite;
+}
+
+.status-indicator.disconnected {
+    background: #f59e0b;
+}
+
+.status-indicator.reconnecting {
+    background: #3b82f6;
+    animation: reconnectPulse 1s infinite;
+}
+
+.status-indicator.syncing {
+    background: #8b5cf6;
+    animation: syncSpin 1s linear infinite;
+}
+
+.status-indicator.disabled {
+    background: #6b7280;
+    opacity: 0.5;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes reconnectPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+}
+
+@keyframes syncSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.status-text {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+/* World Clock Error States */
+.world-clock-display.error {
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.world-clock-display.error .world-clock-time {
+    color: #ef4444;
+}
+
+.world-clock-display.error .world-clock-date {
+    color: #f87171;
+}
+
+/* Feature Unavailable States */
+.feature-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    position: relative;
+}
+
+.feature-disabled::after {
+    content: 'Unavailable';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    z-index: 10;
+}
+
+/* Upload Progress Indicator */
+.upload-progress {
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-progress::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+    animation: uploadProgress 1.5s infinite;
+    width: 30%;
+}
+
+@keyframes uploadProgress {
+    0% {
+        left: -30%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+/* Settings Persistence Warning */
+.settings-not-saved {
+    color: #f59e0b !important;
+    position: relative;
+}
+
+.settings-not-saved::after {
+    content: '⚠️';
+    margin-left: 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Responsive Design - time.is inspired breakpoints */
+@media (max-width: 1200px) {
+    .app-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .time-display-section {
+        margin-bottom: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        grid-template-rows: 1fr auto;
+        padding: 1rem 0.5rem;
+    }
+
+    .settings-panel {
+        top: 1rem;
+        right: 1rem;
+    }
+
+    .settings-content {
+        width: 280px;
+        right: -1rem;
+    }
+
+    .time-display-section {
+        margin-bottom: 2rem;
+    }
+
+    .time-display {
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .date-display {
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-container {
+        padding: 0.5rem;
+    }
+
+    .settings-content {
+        width: calc(100vw - 2rem);
+        right: -1rem;
+    }
+
+    .error-message {
+        left: 1rem;
+        right: 1rem;
+        transform: none;
+        max-width: none;
+    }
+
+    .time-display-section {
+        margin-bottom: 1.5rem;
+        padding: 0 0.5rem;
+    }
+
+    .time-display {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .ampm-text {
+        margin-top: -0.5rem;
+    }
+}
+
+/* Large screen optimizations */
+@media (min-width: 1400px) {
+    .app-container {
+        padding: 3rem 2rem;
+    }
+
+    .time-display-section {
+        margin-bottom: 4rem;
+    }
+
+    .time-display {
+        margin-bottom: 2rem;
+    }
+
+    .date-display {
+        margin-bottom: 3rem;
+    }
+}
+
+/* Text contrast enhancement classes */
+.high-contrast {
+    font-weight: 600 !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), -1px -1px 2px rgba(0, 0, 0, 0.6) !important;
+}
+
+.medium-contrast {
+    font-weight: 500 !important;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6), -1px -1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+.low-contrast {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .time-text {
+        text-shadow: none;
+        font-weight: 400;
+    }
+
+    .settings-toggle {
+        border-width: 2px;
+    }
+
+    /* Enhanced contrast for accessibility */
+    .high-contrast,
+    .medium-contrast,
+    .low-contrast {
+        text-shadow: 2px 2px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000 !important;
+        font-weight: 700 !important;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .app-container {
+        animation: none !important;
+        background-size: 100% 100% !important;
+    }
+}
+
+/* Enhance
+d Timezone Selector Styles */
+.timezone-search-container {
+    position: relative;
+    margin-bottom: 0.75rem;
+}
+
+.timezone-search {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.875rem;
+    transition: border-color 0.3s ease;
+}
+
+.timezone-search:focus {
+    border-color: #3b82f6;
+    outline: none;
+}
+
+.timezone-search:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.timezone-toggle-btn {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid #3b82f6;
+    border-radius: 4px;
+    color: #3b82f6;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.timezone-toggle-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+.timezone-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    margin-top: 0.25rem;
+}
+
+.timezone-result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.timezone-result-item:last-child {
+    border-bottom: none;
+}
+
+.timezone-result-item.selectable {
+    cursor: pointer;
+}
+
+.timezone-result-item.selectable:hover,
+.timezone-result-item.focused {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.timezone-result-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.timezone-result-info {
+    flex: 1;
+}
+
+.timezone-result-city {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.timezone-result-region {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-bottom: 0.125rem;
+}
+
+.timezone-result-tz {
+    font-size: 0.625rem;
+    color: #6b7280;
+    font-family: monospace;
+}
+
+.timezone-result-status {
+    flex-shrink: 0;
+}
+
+.added-indicator {
+    font-size: 0.75rem;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.timezone-no-results {
+    padding: 1rem;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.875rem;
+}
+
+/* Drag and Drop Styles */
+.world-clock-item.draggable {
+    cursor: move;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.world-clock-item.dragging {
+    opacity: 0.5;
+    transform: rotate(2deg);
+}
+
+.world-clock-item.drag-over-top::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #3b82f6;
+    border-radius: 1px;
+}
+
+.world-clock-item.drag-over-bottom::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #3b82f6;
+    border-radius: 1px;
+}
+
+.drag-handle {
+    position: absolute;
+    left: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-size: 0.875rem;
+    cursor: grab;
+    user-select: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.world-clock-item:hover .drag-handle {
+    opacity: 1;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+/* Adjust world clock item layout for drag handle */
+.world-clock-item.draggable .world-clock-info {
+    margin-left: 1.5rem;
+}
+
+/* Enhanced world clock controls */
+.world-clock-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* World Clock Responsive Design - time.is inspired */
+@media (max-width: 1024px) {
+    .world-clocks-container {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.25rem;
+        padding: 0 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .world-clocks-container {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        padding: 0 1rem;
+    }
+
+    .world-clock-display {
+        padding: 1.5rem 1rem;
+        min-width: 200px;
+    }
+
+    .world-clock-time {
+        font-size: clamp(1.5rem, 6vw, 2.2rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .world-clocks-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 0 0.5rem;
+    }
+
+    .world-clock-display {
+        padding: 1.25rem 1rem;
+        min-width: auto;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .world-clock-city-name {
+        font-size: 0.875rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .world-clock-time {
+        font-size: clamp(1.75rem, 8vw, 2.5rem);
+        margin-bottom: 0.5rem;
+    }
+
+    .world-clock-date {
+        font-size: 0.8rem;
+    }
+
+    .timezone-results {
+        max-height: 150px;
+    }
+
+    .timezone-result-item {
+        padding: 0.5rem;
+    }
+
+    .drag-handle {
+        display: none;
+    }
+
+    .world-clock-item.draggable .world-clock-info {
+        margin-left: 0;
+    }
+
+    .world-clock-item.draggable {
+        cursor: default;
+    }
+}
+
+/* World Clock Animation Enhancements */
+.world-clock-display {
+    animation: fadeInUp 0.6s ease both;
+}
+
+.world-clock-display:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.world-clock-display:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.world-clock-display:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+/* Subtle update animation for world clock times */
+@keyframes timeUpdate {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.world-clock-time.updating {
+    animation: timeUpdate 0.3s ease;
+}
+
+/* High contrast mode adjustments */
+@media (prefers-contrast: high) {
+    .timezone-search {
+        border-width: 2px;
+    }
+
+    .timezone-result-item.selectable:hover,
+    .timezone-result-item.focused {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid #fff;
+    }
+}
+
+/* Settings Panel Show/Hide Animations */
+@keyframes settingsSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.9);
+        filter: blur(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes settingsSlideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.9);
+        filter: blur(10px);
+    }
+}
+
+.settings-content.show {
+    animation: settingsSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.settings-content.hide {
+    animation: settingsSlideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Enhanced focus states for accessibility */
+.settings-toggle:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+.setting-checkbox:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+.opacity-slider:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Reduced motion adjustments */
+@media (prefers-reduced-motion: reduce) {
+    .world-clock-item.draggable {
+        transition: none;
+    }
+
+    .world-clock-item.dragging {
+        transform: none;
+    }
+
+    .drag-handle {
+        transition: none;
+    }
+
+    .settings-toggle:hover {
+        transform: scale(1.05);
+    }
+
+    .settings-content {
+        transition: opacity 0.2s ease;
+    }
+
+    .settings-content.show,
+    .settings-content.hide {
+        animation: none;
+    }
+
+    .world-clock-display:hover {
+        transform: translateY(-2px);
+    }
+
+    .time-text:hover {
+        transform: none;
+    }
+}

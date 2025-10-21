@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Local time display webapp with NTP synchronization and customizable backgrounds">
+    <meta name="author" content="Time Display Webapp">
+    <meta name="theme-color" content="#000000">
+    <title>Time Display</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <main class="app-container">
+        <header class="app-header">
+            <h1 class="visually-hidden">Time Display Application</h1>
+        </header>
+
+        <section class="christmas-countdown" id="christmasCountdown">
+            <span class="countdown-text" id="countdownText">🎄 Loading...</span>
+        </section>
+
+        <section class="time-display-section" aria-live="polite" aria-label="Current time display">
+            <div class="time-display" id="timeDisplay">
+                <span class="time-text" id="timeText">--:--</span>
+                <span class="ampm-text" id="ampmText"></span>
+            </div>
+            <div class="date-display" id="dateDisplay">
+                <span class="date-text" id="dateText">Loading date...</span>
+            </div>
+            <div class="connection-status" id="connectionStatus" aria-live="polite">
+                <span class="status-indicator" id="statusIndicator"></span>
+                <span class="status-text" id="statusText">Loading...</span>
+            </div>
+        </section>
+
+        <aside class="settings-panel" id="settingsPanel" aria-label="Time display settings">
+            <button class="settings-toggle" id="settingsToggle" aria-expanded="false" aria-controls="settingsContent">
+                <span class="visually-hidden">Toggle settings</span>
+                <span class="settings-icon">⚙️</span>
+            </button>
+
+            <div class="settings-content" id="settingsContent" hidden>
+                <div class="settings-group">
+                    <h2 class="settings-title">Display Settings</h2>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showSeconds" class="setting-checkbox">
+                            <span class="checkbox-text">Show seconds</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="use24Hour" class="setting-checkbox">
+                            <span class="checkbox-text">24-hour format</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h2 class="settings-title">World Clocks</h2>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showWorldClocks" class="setting-checkbox">
+                            <span class="checkbox-text">Show world clocks</span>
+                        </label>
+                    </div>
+
+                    <div class="world-clock-settings" id="worldClockSettings">
+                        <div class="world-clock-list" id="worldClockList">
+                            <!-- World clock items will be dynamically added here -->
+                        </div>
+
+                        <div class="add-world-clock" id="addWorldClockSection">
+                            <select id="timezoneSelect" class="timezone-select">
+                                <option value="">Select a timezone...</option>
+                                <option value="America/New_York">New York (EST/EDT)</option>
+                                <option value="America/Los_Angeles">Los Angeles (PST/PDT)</option>
+                                <option value="America/Chicago">Chicago (CST/CDT)</option>
+                                <option value="America/Denver">Denver (MST/MDT)</option>
+                                <option value="Europe/London">London (GMT/BST)</option>
+                                <option value="Europe/Paris">Paris (CET/CEST)</option>
+                                <option value="Europe/Monaco">Monaco (CET/CEST)</option>
+                                <option value="Europe/Berlin">Berlin (CET/CEST)</option>
+                                <option value="Europe/Rome">Rome (CET/CEST)</option>
+                                <option value="Europe/Madrid">Madrid (CET/CEST)</option>
+                                <option value="Asia/Tokyo">Tokyo (JST)</option>
+                                <option value="Asia/Shanghai">Shanghai (CST)</option>
+                                <option value="Asia/Hong_Kong">Hong Kong (HKT)</option>
+                                <option value="Asia/Singapore">Singapore (SGT)</option>
+                                <option value="Asia/Dubai">Dubai (GST)</option>
+                                <option value="Asia/Kolkata">Mumbai (IST)</option>
+                                <option value="Australia/Sydney">Sydney (AEST/AEDT)</option>
+                                <option value="Australia/Melbourne">Melbourne (AEST/AEDT)</option>
+                                <option value="Pacific/Auckland">Auckland (NZST/NZDT)</option>
+                                <option value="America/Sao_Paulo">São Paulo (BRT/BRST)</option>
+                                <option value="America/Mexico_City">Mexico City (CST/CDT)</option>
+                            </select>
+                            <button id="addWorldClockBtn" class="add-clock-button" disabled>
+                                Add World Clock
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h2 class="settings-title">Background</h2>
+
+                    <div class="setting-item">
+                        <label for="backgroundUpload" class="upload-label">
+                            Upload Background
+                        </label>
+                        <input type="file" id="backgroundUpload" class="file-input" accept="image/*">
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="opacitySlider" class="setting-label">
+                            Background Opacity
+                        </label>
+                        <input type="range" id="opacitySlider" class="opacity-slider" min="0" max="100" value="50"
+                            aria-valuemin="0" aria-valuemax="100">
+                        <span class="opacity-value" id="opacityValue">50%</span>
+                    </div>
+
+                    <button class="reset-button" id="resetBackground">
+                        Reset to Default
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="background-overlay" id="backgroundOverlay"></div>
+        
+        <section class="world-clocks-section" id="worldClocksSection" aria-label="World clocks" hidden>
+            <div class="world-clocks-container" id="worldClocksContainer">
+                <!-- World clock displays will be dynamically added here -->
+            </div>
+        </section>
+    </main>
+
+    <div class="error-message" id="errorMessage" role="alert" hidden>
+        <span class="error-text" id="errorText"></span>
+        <button class="error-close" id="errorClose" aria-label="Close error message">×</button>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script>
+        console.log('Starting time display application...');
+
+        // Application state
+        let showSeconds = true;
+        let use24Hour = false;
+        let showWorldClocks = false;
+        let worldClocks = [];
+        let updateInterval = null;
+        let backgroundOpacity = 0.5;
+
+        // Initialize application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM loaded, initializing...');
+
+            // Load settings from localStorage
+            loadSettings();
+
+            // Start time display
+            startTimeDisplay();
+
+            // Setup settings functionality
+            setupSettings();
+
+            // Setup error handling
+            setupErrorHandling();
+
+            console.log('Application initialized successfully');
+        });
+
+        // Load settings from localStorage
+        function loadSettings() {
+            try {
+                const saved = localStorage.getItem('timeDisplaySettings');
+                if (saved) {
+                    const settings = JSON.parse(saved);
+                    showSeconds = settings.showSeconds !== undefined ? settings.showSeconds : true;
+                    use24Hour = settings.use24Hour !== undefined ? settings.use24Hour : false;
+                    showWorldClocks = settings.showWorldClocks !== undefined ? settings.showWorldClocks : false;
+                    worldClocks = settings.worldClocks || [];
+                    backgroundOpacity = settings.backgroundOpacity !== undefined ? settings.backgroundOpacity : 0.5;
+                }
+            } catch (error) {
+                console.warn('Failed to load settings:', error);
+            }
+
+            // Update UI to reflect loaded settings
+            const showSecondsCheckbox = document.getElementById('showSeconds');
+            const use24HourCheckbox = document.getElementById('use24Hour');
+            const showWorldClocksCheckbox = document.getElementById('showWorldClocks');
+
+            if (showSecondsCheckbox) {
+                showSecondsCheckbox.checked = showSeconds;
+            }
+            if (use24HourCheckbox) {
+                use24HourCheckbox.checked = use24Hour;
+            }
+            if (showWorldClocksCheckbox) {
+                showWorldClocksCheckbox.checked = showWorldClocks;
+            }
+            
+            // Update opacity slider
+            const opacitySlider = document.getElementById('opacitySlider');
+            const opacityValue = document.getElementById('opacityValue');
+            if (opacitySlider) {
+                opacitySlider.value = Math.round(backgroundOpacity * 100);
+            }
+            if (opacityValue) {
+                opacityValue.textContent = Math.round(backgroundOpacity * 100) + '%';
+            }
+            
+            // Apply saved background
+            applySavedBackground();
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            try {
+                const settings = {
+                    showSeconds: showSeconds,
+                    use24Hour: use24Hour,
+                    showWorldClocks: showWorldClocks,
+                    worldClocks: worldClocks,
+                    backgroundOpacity: backgroundOpacity,
+                    backgroundImage: localStorage.getItem('backgroundImage')
+                };
+                localStorage.setItem('timeDisplaySettings', JSON.stringify(settings));
+                console.log('Settings saved:', settings);
+            } catch (error) {
+                console.warn('Failed to save settings:', error);
+            }
+        }
+
+        // Start time display
+        function startTimeDisplay() {
+            const timeElement = document.getElementById('timeText');
+            const dateElement = document.getElementById('dateText');
+            const ampmElement = document.getElementById('ampmText');
+            const statusText = document.getElementById('statusText');
+            const statusIndicator = document.getElementById('statusIndicator');
+
+            if (!timeElement || !dateElement) {
+                console.error('Required time display elements not found');
+                return;
+            }
+
+            function updateTime() {
+                const now = new Date();
+
+                // Format time
+                let hours = now.getHours();
+                const minutes = now.getMinutes();
+                const seconds = now.getSeconds();
+                let ampm = '';
+
+                if (!use24Hour) {
+                    ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    if (hours === 0) hours = 12;
+                }
+
+                const formattedHours = hours.toString().padStart(2, '0');
+                const formattedMinutes = minutes.toString().padStart(2, '0');
+                const formattedSeconds = seconds.toString().padStart(2, '0');
+
+                let timeString = formattedHours + ':' + formattedMinutes;
+                if (showSeconds) {
+                    timeString += ':' + formattedSeconds;
+                }
+
+                timeElement.textContent = timeString;
+
+                // Update AM/PM
+                if (ampmElement) {
+                    if (!use24Hour && ampm) {
+                        ampmElement.textContent = ampm;
+                        ampmElement.style.display = 'inline';
+                    } else {
+                        ampmElement.style.display = 'none';
+                    }
+                }
+
+                // Format date with week number
+                const options = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                };
+                const baseDateString = now.toLocaleDateString('en-US', options);
+                const weekNumber = getWeekNumber(now);
+                const dateString = baseDateString + ', week ' + weekNumber;
+                dateElement.textContent = dateString;
+                
+                // Update Christmas countdown
+                updateChristmasCountdown();
+                
+                // Update world clocks if they are shown
+                if (showWorldClocks && worldClocks.length > 0) {
+                    updateWorldClockTimes();
+                }
+            }
+
+            // Update immediately and then every second
+            updateTime();
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+            updateInterval = setInterval(updateTime, 1000);
+
+            // Update status
+            if (statusText) {
+                statusText.textContent = 'Local time';
+            }
+            if (statusIndicator) {
+                statusIndicator.className = 'status-indicator disconnected';
+            }
+
+            console.log('Time display started');
+        }
+
+        // Setup settings functionality
+        function setupSettings() {
+            const settingsToggle = document.getElementById('settingsToggle');
+            const settingsContent = document.getElementById('settingsContent');
+            const showSecondsCheckbox = document.getElementById('showSeconds');
+            const use24HourCheckbox = document.getElementById('use24Hour');
+
+            // Settings panel toggle
+            if (settingsToggle && settingsContent) {
+                settingsToggle.addEventListener('click', function () {
+                    const isHidden = settingsContent.hidden;
+                    settingsContent.hidden = !isHidden;
+                    settingsToggle.setAttribute('aria-expanded', !isHidden);
+                    console.log('Settings panel toggled:', !isHidden);
+                });
+            }
+
+            // Show seconds checkbox
+            if (showSecondsCheckbox) {
+                showSecondsCheckbox.addEventListener('change', function () {
+                    showSeconds = this.checked;
+                    saveSettings();
+                    console.log('Show seconds changed to:', showSeconds);
+                });
+            }
+
+            // 24-hour format checkbox
+            if (use24HourCheckbox) {
+                use24HourCheckbox.addEventListener('change', function () {
+                    use24Hour = this.checked;
+                    saveSettings();
+                    console.log('24-hour format changed to:', use24Hour);
+                });
+            }
+            
+            // Show world clocks checkbox
+            const showWorldClocksCheckbox = document.getElementById('showWorldClocks');
+            if (showWorldClocksCheckbox) {
+                showWorldClocksCheckbox.addEventListener('change', function() {
+                    showWorldClocks = this.checked;
+                    saveSettings();
+                    updateWorldClockDisplay();
+                    console.log('Show world clocks changed to:', showWorldClocks);
+                });
+            }
+            
+            // Timezone selector and add button
+            const timezoneSelect = document.getElementById('timezoneSelect');
+            const addWorldClockBtn = document.getElementById('addWorldClockBtn');
+            
+            if (timezoneSelect) {
+                timezoneSelect.addEventListener('change', function() {
+                    if (addWorldClockBtn) {
+                        addWorldClockBtn.disabled = !this.value;
+                    }
+                });
+            }
+            
+            if (addWorldClockBtn) {
+                addWorldClockBtn.addEventListener('click', function() {
+                    addWorldClock();
+                });
+            }
+            
+            // Background upload functionality
+            const backgroundUpload = document.getElementById('backgroundUpload');
+            const opacitySlider = document.getElementById('opacitySlider');
+            const opacityValue = document.getElementById('opacityValue');
+            const resetButton = document.getElementById('resetBackground');
+            
+            if (backgroundUpload) {
+                backgroundUpload.addEventListener('change', function(e) {
+                    handleBackgroundUpload(e);
+                });
+            }
+            
+            if (opacitySlider) {
+                opacitySlider.addEventListener('input', function(e) {
+                    backgroundOpacity = parseInt(e.target.value) / 100;
+                    updateBackgroundOpacity();
+                    saveSettings();
+                    if (opacityValue) {
+                        opacityValue.textContent = e.target.value + '%';
+                    }
+                });
+            }
+            
+            if (resetButton) {
+                resetButton.addEventListener('click', function() {
+                    resetBackground();
+                });
+            }
+            
+            // Initialize world clock display
+            updateWorldClockDisplay();
+            updateWorldClockList();
+
+            // Close settings when clicking outside
+            document.addEventListener('click', function (e) {
+                if (settingsContent && !settingsContent.hidden &&
+                    !settingsToggle.contains(e.target) &&
+                    !settingsContent.contains(e.target)) {
+                    settingsContent.hidden = true;
+                    settingsToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            console.log('Settings functionality initialized');
+        }
+
+        // Setup error handling
+        function setupErrorHandling() {
+            const errorClose = document.getElementById('errorClose');
+
+            if (errorClose) {
+                errorClose.addEventListener('click', function () {
+                    const errorMessage = document.getElementById('errorMessage');
+                    if (errorMessage) {
+                        errorMessage.hidden = true;
+                    }
+                });
+            }
+        }
+        
+        // World Clock Functions
+        function addWorldClock() {
+            const timezoneSelect = document.getElementById('timezoneSelect');
+            if (!timezoneSelect || !timezoneSelect.value) return;
+            
+            const timezone = timezoneSelect.value;
+            const cityName = timezoneSelect.options[timezoneSelect.selectedIndex].text.split(' (')[0];
+            
+            // Check if already exists
+            if (worldClocks.some(wc => wc.timezone === timezone)) {
+                alert('This timezone is already added');
+                return;
+            }
+            
+            // Check maximum limit
+            if (worldClocks.length >= 3) {
+                alert('Maximum of 3 world clocks allowed');
+                return;
+            }
+            
+            // Add new world clock
+            const worldClock = {
+                id: 'wc_' + Date.now(),
+                cityName: cityName,
+                timezone: timezone
+            };
+            
+            worldClocks.push(worldClock);
+            saveSettings();
+            updateWorldClockList();
+            updateWorldClockDisplay();
+            
+            // Reset selector
+            timezoneSelect.value = '';
+            document.getElementById('addWorldClockBtn').disabled = true;
+            
+            console.log('Added world clock:', worldClock);
+        }
+        
+        function removeWorldClock(id) {
+            worldClocks = worldClocks.filter(wc => wc.id !== id);
+            saveSettings();
+            updateWorldClockList();
+            updateWorldClockDisplay();
+            console.log('Removed world clock:', id);
+        }
+        
+        function updateWorldClockList() {
+            const worldClockList = document.getElementById('worldClockList');
+            if (!worldClockList) return;
+            
+            worldClockList.innerHTML = '';
+            
+            worldClocks.forEach(function(worldClock) {
+                const item = document.createElement('div');
+                item.className = 'world-clock-item';
+                item.innerHTML = 
+                    '<div class="world-clock-info">' +
+                        '<div class="world-clock-city">' + worldClock.cityName + '</div>' +
+                        '<div class="world-clock-timezone">' + worldClock.timezone + '</div>' +
+                    '</div>' +
+                    '<div class="world-clock-controls">' +
+                        '<button class="world-clock-remove" onclick="removeWorldClock(\'' + worldClock.id + '\')" aria-label="Remove ' + worldClock.cityName + ' world clock">×</button>' +
+                    '</div>';
+                
+                worldClockList.appendChild(item);
+            });
+        }
+        
+        function updateWorldClockDisplay() {
+            const worldClocksSection = document.getElementById('worldClocksSection');
+            const worldClocksContainer = document.getElementById('worldClocksContainer');
+            
+            if (!worldClocksSection || !worldClocksContainer) return;
+            
+            if (showWorldClocks && worldClocks.length > 0) {
+                worldClocksSection.hidden = false;
+                worldClocksContainer.innerHTML = '';
+                
+                worldClocks.forEach(function(worldClock) {
+                    const display = document.createElement('div');
+                    display.className = 'world-clock-display';
+                    display.innerHTML = 
+                        '<div class="world-clock-city-name">' + worldClock.cityName + '</div>' +
+                        '<div class="world-clock-time" id="worldClock_' + worldClock.id + '_time">--:--</div>' +
+                        '<div class="world-clock-date" id="worldClock_' + worldClock.id + '_date">Loading...</div>';
+                    
+                    worldClocksContainer.appendChild(display);
+                });
+                
+                updateWorldClockTimes();
+            } else {
+                worldClocksSection.hidden = true;
+            }
+        }
+        
+        function updateWorldClockTimes() {
+            worldClocks.forEach(function(worldClock) {
+                try {
+                    const now = new Date();
+                    const timeElement = document.getElementById('worldClock_' + worldClock.id + '_time');
+                    const dateElement = document.getElementById('worldClock_' + worldClock.id + '_date');
+                    
+                    if (timeElement && dateElement) {
+                        // Format time for timezone
+                        const timeString = now.toLocaleTimeString('en-US', {
+                            timeZone: worldClock.timezone,
+                            hour12: !use24Hour,
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: showSeconds ? '2-digit' : undefined
+                        });
+                        
+                        // Format date for timezone
+                        const dateString = now.toLocaleDateString('en-US', {
+                            timeZone: worldClock.timezone,
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric'
+                        });
+                        
+                        timeElement.textContent = timeString;
+                        dateElement.textContent = dateString;
+                    }
+                } catch (error) {
+                    console.error('Error updating world clock time for', worldClock.cityName, error);
+                    const timeElement = document.getElementById('worldClock_' + worldClock.id + '_time');
+                    const dateElement = document.getElementById('worldClock_' + worldClock.id + '_date');
+                    if (timeElement) timeElement.textContent = 'Error';
+                    if (dateElement) dateElement.textContent = 'Timezone unavailable';
+                }
+            });
+        }
+        
+        // Background Functions
+        function handleBackgroundUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            // Validate file size (5MB limit)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                alert('Image file is too large. Maximum size is 5MB.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imageData = e.target.result;
+                    localStorage.setItem('backgroundImage', imageData);
+                    applyBackgroundImage(imageData);
+                    saveSettings();
+                    console.log('Background image uploaded successfully');
+                } catch (error) {
+                    console.error('Failed to save background image:', error);
+                    alert('Failed to save background image. It may be too large.');
+                }
+            };
+            
+            reader.onerror = function() {
+                alert('Failed to read the image file');
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        function applyBackgroundImage(imageData) {
+            const backgroundOverlay = document.getElementById('backgroundOverlay');
+            if (backgroundOverlay && imageData) {
+                backgroundOverlay.style.backgroundImage = 'url(' + imageData + ')';
+                backgroundOverlay.style.backgroundSize = 'cover';
+                backgroundOverlay.style.backgroundPosition = 'center';
+                backgroundOverlay.style.backgroundRepeat = 'no-repeat';
+                updateBackgroundOpacity();
+            }
+        }
+        
+        function updateBackgroundOpacity() {
+            const backgroundOverlay = document.getElementById('backgroundOverlay');
+            if (backgroundOverlay) {
+                backgroundOverlay.style.opacity = backgroundOpacity;
+            }
+        }
+        
+        function applySavedBackground() {
+            try {
+                const savedImage = localStorage.getItem('backgroundImage');
+                if (savedImage) {
+                    applyBackgroundImage(savedImage);
+                }
+                updateBackgroundOpacity();
+            } catch (error) {
+                console.error('Failed to apply saved background:', error);
+            }
+        }
+        
+        function resetBackground() {
+            const backgroundOverlay = document.getElementById('backgroundOverlay');
+            if (backgroundOverlay) {
+                backgroundOverlay.style.backgroundImage = '';
+                backgroundOverlay.style.opacity = '0.5';
+            }
+            
+            // Reset opacity slider
+            const opacitySlider = document.getElementById('opacitySlider');
+            const opacityValue = document.getElementById('opacityValue');
+            if (opacitySlider) {
+                opacitySlider.value = 50;
+            }
+            if (opacityValue) {
+                opacityValue.textContent = '50%';
+            }
+            
+            backgroundOpacity = 0.5;
+            
+            // Clear from localStorage
+            localStorage.removeItem('backgroundImage');
+            saveSettings();
+            
+            // Clear file input
+            const backgroundUpload = document.getElementById('backgroundUpload');
+            if (backgroundUpload) {
+                backgroundUpload.value = '';
+            }
+            
+            console.log('Background reset to default');
+        }
+        
+        // Christmas Countdown Function
+        function updateChristmasCountdown() {
+            const countdownElement = document.getElementById('countdownText');
+            if (!countdownElement) return;
+            
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            
+            // Christmas date for this year
+            let christmas = new Date(currentYear, 11, 25); // December 25th
+            
+            // If Christmas has passed this year, calculate for next year
+            if (now > christmas) {
+                christmas = new Date(currentYear + 1, 11, 25);
+            }
+            
+            // Calculate the difference in milliseconds
+            const timeDiff = christmas.getTime() - now.getTime();
+            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            
+            // Update the display
+            if (daysDiff === 0) {
+                // It's Christmas Day!
+                countdownElement.textContent = '🎄 Merry Christmas! 🎅';
+                countdownElement.classList.add('christmas-day');
+            } else if (daysDiff === 1) {
+                countdownElement.textContent = '🎄 Christmas is tomorrow! 🎁';
+                countdownElement.classList.remove('christmas-day');
+            } else if (daysDiff <= 7) {
+                countdownElement.textContent = `🎄 ${daysDiff} days until Christmas! 🎁`;
+                countdownElement.classList.remove('christmas-day');
+            } else if (daysDiff <= 30) {
+                countdownElement.textContent = `🎄 ${daysDiff} days until Christmas 🎅`;
+                countdownElement.classList.remove('christmas-day');
+            } else {
+                countdownElement.textContent = `🎄 ${daysDiff} days until Christmas`;
+                countdownElement.classList.remove('christmas-day');
+            }
+        }
+        
+        // Week Number Calculation Function
+        function getWeekNumber(date) {
+            // Create a copy of the date to avoid modifying the original
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            
+            // Set to nearest Thursday: current date + 4 - current day number
+            // Make Sunday's day number 7
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            
+            // Get first day of year
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            
+            // Calculate full weeks to nearest Thursday
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        // Global error handlers
+        window.addEventListener('error', function (event) {
+            console.error('Uncaught error:', event.error);
+        });
+
+        window.addEventListener('unhandledrejection', function (event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            event.preventDefault();
+        });
+    </script>
+</body>
+
+</html>

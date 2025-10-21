@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Test</title>
+</head>
+<body>
+    <div class="time-display" id="timeDisplay">
+        <span class="time-text" id="timeText">--:--</span>
+        <span class="ampm-text" id="ampmText"></span>
+    </div>
+    <div class="date-display" id="dateDisplay">
+        <span class="date-text" id="dateText">Loading date...</span>
+    </div>
+    <div class="connection-status" id="connectionStatus">
+        <span class="status-indicator" id="statusIndicator"></span>
+        <span class="status-text" id="statusText">Connecting...</span>
+    </div>
+    <div class="error-message" id="errorMessage" hidden>
+        <span class="error-text" id="errorText"></span>
+        <button class="error-close" id="errorClose">×</button>
+    </div>
+
+    <script type="module">
+        console.log('Starting minimal test...');
+        
+        // Test basic DOM elements
+        const timeText = document.getElementById('timeText');
+        const dateText = document.getElementById('dateText');
+        
+        console.log('timeText element:', timeText);
+        console.log('dateText element:', dateText);
+        
+        if (timeText && dateText) {
+            console.log('DOM elements found, starting basic time display...');
+            
+            function updateBasicTime() {
+                const now = new Date();
+                timeText.textContent = now.toLocaleTimeString();
+                dateText.textContent = now.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                console.log('Time updated:', now.toLocaleTimeString());
+            }
+            
+            updateBasicTime();
+            setInterval(updateBasicTime, 1000);
+        } else {
+            console.error('DOM elements not found!');
+        }
+        
+        // Test importing individual modules
+        try {
+            console.log('Testing SettingsManager import...');
+            const { SettingsManager } = await import('./js/managers/SettingsManager.js');
+            const settings = new SettingsManager();
+            await settings.loadAllSettings();
+            console.log('SettingsManager works:', settings);
+            
+            console.log('Testing NTPService import...');
+            const { NTPService } = await import('./js/services/NTPService.js');
+            const ntp = new NTPService();
+            console.log('NTPService works:', ntp);
+            
+            console.log('Testing UIController import...');
+            const { UIController } = await import('./js/controllers/UIController.js');
+            console.log('UIController imported successfully');
+            
+            console.log('Testing TimeController import...');
+            const { TimeController } = await import('./js/controllers/TimeController.js');
+            console.log('TimeController imported successfully');
+            
+            // Try to create a minimal app
+            console.log('Creating minimal app...');
+            const uiController = new UIController(settings, null);
+            const timeController = new TimeController(ntp, uiController, settings);
+            
+            console.log('Initializing TimeController...');
+            await timeController.initialize();
+            console.log('TimeController initialized successfully!');
+            
+        } catch (error) {
+            console.error('Module test failed:', error);
+            console.error('Error stack:', error.stack);
+        }
+    </script>
+</body>
+</html>

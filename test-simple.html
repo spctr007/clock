@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Local time display webapp with NTP synchronization and customizable backgrounds">
+    <meta name="author" content="Time Display Webapp">
+    <meta name="theme-color" content="#000000">
+    <title>Time Display</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <main class="app-container">
+        <header class="app-header">
+            <h1 class="visually-hidden">Time Display Application</h1>
+        </header>
+        
+        <section class="time-display-section" aria-live="polite" aria-label="Current time display">
+            <div class="time-display" id="timeDisplay">
+                <span class="time-text" id="timeText">--:--</span>
+                <span class="ampm-text" id="ampmText"></span>
+            </div>
+            <div class="date-display" id="dateDisplay">
+                <span class="date-text" id="dateText">Loading date...</span>
+            </div>
+            <div class="connection-status" id="connectionStatus" aria-live="polite">
+                <span class="status-indicator" id="statusIndicator"></span>
+                <span class="status-text" id="statusText">Connecting...</span>
+            </div>
+        </section>
+
+        <section class="world-clocks-section" id="worldClocksSection" aria-label="World clocks" hidden>
+            <div class="world-clocks-container" id="worldClocksContainer">
+                <!-- World clock displays will be dynamically added here -->
+            </div>
+        </section>
+
+        <aside class="settings-panel" id="settingsPanel" aria-label="Time display settings">
+            <button class="settings-toggle" id="settingsToggle" aria-expanded="false" aria-controls="settingsContent">
+                <span class="visually-hidden">Toggle settings</span>
+                <span class="settings-icon">⚙️</span>
+            </button>
+            
+            <div class="settings-content" id="settingsContent" hidden>
+                <div class="settings-group">
+                    <h2 class="settings-title">Display Settings</h2>
+                    
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showSeconds" class="setting-checkbox">
+                            <span class="checkbox-text">Show seconds</span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="use24Hour" class="setting-checkbox">
+                            <span class="checkbox-text">24-hour format</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h2 class="settings-title">World Clocks</h2>
+                    
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showWorldClocks" class="setting-checkbox">
+                            <span class="checkbox-text">Show world clocks</span>
+                        </label>
+                    </div>
+                    
+                    <div class="world-clock-settings" id="worldClockSettings">
+                        <div class="world-clock-list" id="worldClockList">
+                            <!-- World clock items will be dynamically added here -->
+                        </div>
+                        
+                        <div class="add-world-clock" id="addWorldClockSection">
+                            <select id="timezoneSelect" class="timezone-select">
+                                <option value="">Select a timezone...</option>
+                            </select>
+                            <button id="addWorldClockBtn" class="add-clock-button" disabled>
+                                Add World Clock
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h2 class="settings-title">Background</h2>
+                    
+                    <div class="setting-item">
+                        <label for="backgroundUpload" class="upload-label">
+                            Upload Background
+                        </label>
+                        <input type="file" id="backgroundUpload" class="file-input" accept="image/*">
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label for="opacitySlider" class="setting-label">
+                            Background Opacity
+                        </label>
+                        <input type="range" id="opacitySlider" class="opacity-slider" 
+                               min="0" max="100" value="50" aria-valuemin="0" aria-valuemax="100">
+                        <span class="opacity-value" id="opacityValue">50%</span>
+                    </div>
+                    
+                    <button class="reset-button" id="resetBackground">
+                        Reset to Default
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="background-overlay" id="backgroundOverlay"></div>
+    </main>
+
+    <div class="error-message" id="errorMessage" role="alert" hidden>
+        <span class="error-text" id="errorText"></span>
+        <button class="error-close" id="errorClose" aria-label="Close error message">×</button>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="js/simple-main.js"></script>
+</body>
+</html>

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Display Webapp - Test Runner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Time Display Webapp - Unit Tests</h1>
+        <p>Testing time formatting and display logic functionality.</p>
+        
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="clearResults()">Clear Results</button>
+        
+        <div id="test-results"></div>
+        <div id="test-summary"></div>
+    </div>
+
+    <script type="module">
+        // Simple test framework
+        class TestFramework {
+            constructor() {
+                this.tests = [];
+                this.results = [];
+            }
+            
+            describe(description, callback) {
+                console.log(`\n--- ${description} ---`);
+                callback();
+            }
+            
+            test(description, callback) {
+                this.tests.push({ description, callback });
+            }
+            
+            beforeEach(callback) {
+                this.beforeEachCallback = callback;
+            }
+            
+            afterEach(callback) {
+                this.afterEachCallback = callback;
+            }
+            
+            expect(actual) {
+                return {
+                    toBe: (expected) => {
+                        if (actual !== expected) {
+                            throw new Error(`Expected ${expected}, but got ${actual}`);
+                        }
+                    },
+                    toContain: (expected) => {
+                        if (!actual.includes(expected)) {
+                            throw new Error(`Expected "${actual}" to contain "${expected}"`);
+                        }
+                    },
+                    toBeGreaterThan: (expected) => {
+                        if (actual <= expected) {
+                            throw new Error(`Expected ${actual} to be greater than ${expected}`);
+                        }
+                    },
+                    not: {
+                        toThrow: () => {
+                            try {
+                                if (typeof actual === 'function') {
+                                    actual();
+                                }
+                            } catch (error) {
+                                throw new Error(`Expected function not to throw, but it threw: ${error.message}`);
+                            }
+                        }
+                    }
+                };
+            }
+            
+            async runTests() {
+                this.results = [];
+                
+                for (const test of this.tests) {
+                    try {
+                        if (this.beforeEachCallback) {
+                            this.beforeEachCallback();
+                        }
+                        
+                        await test.callback();
+                        
+                        if (this.afterEachCallback) {
+                            this.afterEachCallback();
+                        }
+                        
+                        this.results.push({
+                            description: test.description,
+                            status: 'pass'
+                        });
+                        
+                    } catch (error) {
+                        this.results.push({
+                            description: test.description,
+                            status: 'fail',
+                            error: error.message
+                        });
+                    }
+                }
+                
+                return this.results;
+            }
+        }
+        
+        // Make test framework global
+        window.testFramework = new TestFramework();
+        window.describe = (desc, cb) => testFramework.describe(desc, cb);
+        window.test = (desc, cb) => testFramework.test(desc, cb);
+        window.beforeEach = (cb) => testFramework.beforeEach(cb);
+        window.afterEach = (cb) => testFramework.afterEach(cb);
+        window.expect = (actual) => testFramework.expect(actual);
+        
+        // Mock dependencies for testing
+        class MockNTPService {
+            async fetchNTPTime() {
+                return new Date();
+            }
+            
+            calculateOffset(ntpTime, localTime) {
+                return 0;
+            }
+        }
+
+        class MockUIController {
+            updateTimeDisplay(timeData) {
+                this.lastTimeData = timeData;
+            }
+            
+            updateDateDisplay(dateData) {
+                this.lastDateData = dateData;
+            }
+            
+            showConnectionStatus(isConnected) {
+                this.lastConnectionStatus = isConnected;
+            }
+        }
+
+        class MockSettingsManager {
+            constructor() {
+                this.settings = {
+                    showSeconds: true,
+                    use24HourFormat: false,
+                    ntpSyncInterval: 15
+                };
+            }
+            
+            getSetting(key, defaultValue) {
+                return this.settings[key] !== undefined ? this.settings[key] : defaultValue;
+            }
+            
+            saveSetting(key, value) {
+                this.settings[key] = value;
+            }
+        }
+        
+        // TimeController class (simplified for testing)
+        class TimeController {
+            constructor(ntpService, uiController, settingsManager) {
+                this.ntpService = ntpService;
+                this.uiController = uiController;
+                this.settingsManager = settingsManager;
+                this.timeOffset = 0;
+                this.isNTPSynced = false;
+                this.lastSyncTime = null;
+            }
+            
+            formatTime(date) {
+                const showSeconds = this.settingsManager.getSetting('showSeconds', true);
+                const use24Hour = this.settingsManager.getSetting('use24HourFormat', false);
+                
+                let hours = date.getHours();
+                const minutes = date.getMinutes();
+                const seconds = date.getSeconds();
+                
+                let ampm = '';
+                
+                if (!use24Hour) {
+                    ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    if (hours === 0) hours = 12;
+                }
+                
+                const formattedHours = hours.toString().padStart(2, '0');
+                const formattedMinutes = minutes.toString().padStart(2, '0');
+                const formattedSeconds = seconds.toString().padStart(2, '0');
+                
+                let timeString = `${formattedHours}:${formattedMinutes}`;
+                if (showSeconds) {
+                    timeString += `:${formattedSeconds}`;
+                }
+                
+                return {
+                    timeString,
+                    ampm,
+                    showSeconds,
+                    use24Hour,
+                    isNTPSynced: this.isNTPSynced,
+                    lastSync: this.lastSyncTime
+                };
+            }
+            
+            formatTime12Hour(date, showSeconds = true) {
+                let hours = date.getHours();
+                const minutes = date.getMinutes();
+                const seconds = date.getSeconds();
+                
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                if (hours === 0) hours = 12;
+                
+                const formattedHours = hours.toString().padStart(2, '0');
+                const formattedMinutes = minutes.toString().padStart(2, '0');
+                const formattedSeconds = seconds.toString().padStart(2, '0');
+                
+                let timeString = `${formattedHours}:${formattedMinutes}`;
+                if (showSeconds) {
+                    timeString += `:${formattedSeconds}`;
+                }
+                
+                return {
+                    timeString,
+                    ampm,
+                    hours,
+                    minutes,
+                    seconds
+                };
+            }
+            
+            formatTime24Hour(date, showSeconds = true) {
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                const seconds = date.getSeconds();
+                
+                const formattedHours = hours.toString().padStart(2, '0');
+                const formattedMinutes = minutes.toString().padStart(2, '0');
+                const formattedSeconds = seconds.toString().padStart(2, '0');
+                
+                let timeString = `${formattedHours}:${formattedMinutes}`;
+                if (showSeconds) {
+                    timeString += `:${formattedSeconds}`;
+                }
+                
+                return {
+                    timeString,
+                    ampm: '',
+                    hours,
+                    minutes,
+                    seconds
+                };
+            }
+            
+            toggleSecondsDisplay() {
+                const currentSetting = this.settingsManager.getSetting('showSeconds', true);
+                const newSetting = !currentSetting;
+                this.settingsManager.saveSetting('showSeconds', newSetting);
+                return newSetting;
+            }
+            
+            toggleTimeFormat() {
+                const currentSetting = this.settingsManager.getSetting('use24HourFormat', false);
+                const newSetting = !currentSetting;
+                this.settingsManager.saveSetting('use24HourFormat', newSetting);
+                return newSetting;
+            }
+            
+            formatDate(date) {
+                const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const monthNames = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+                
+                const dayName = dayNames[date.getDay()];
+                const day = date.getDate();
+                const monthName = monthNames[date.getMonth()];
+                const year = date.getFullYear();
+                const weekNumber = this.getWeekNumber(date);
+                
+                const dateString = `${dayName}, ${day} ${monthName}, ${year}, week ${weekNumber}`;
+                
+                return {
+                    dateString,
+                    dayName,
+                    day,
+                    monthName,
+                    year,
+                    weekNumber,
+                    fullDate: date
+                };
+            }
+            
+            getWeekNumber(date) {
+                const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+                const dayNum = d.getUTCDay() || 7;
+                d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+                const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+                return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            }
+            
+            isLeapYear(year) {
+                return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+            }
+            
+            getDaysInMonth(date) {
+                return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+            }
+            
+            getDayOfYear(date) {
+                const start = new Date(date.getFullYear(), 0, 0);
+                const diff = date - start;
+                const oneDay = 1000 * 60 * 60 * 24;
+                return Math.floor(diff / oneDay);
+            }
+            
+            destroy() {
+                // Cleanup
+            }
+        }
+        
+        // Test definitions
+        let timeController, mockNTPService, mockUIController, mockSettingsManager;
+        
+        beforeEach(() => {
+            mockNTPService = new MockNTPService();
+            mockUIController = new MockUIController();
+            mockSettingsManager = new MockSettingsManager();
+            
+            timeController = new TimeController(
+                mockNTPService,
+                mockUIController,
+                mockSettingsManager
+            );
+        });
+        
+        afterEach(() => {
+            if (timeController) {
+                timeController.destroy();
+            }
+        });
+
+        describe('Time Formatting', () => {
+            test('should format time in 12-hour format correctly', () => {
+                const testDate = new Date('2025-10-14T14:30:45');
+                mockSettingsManager.settings.use24HourFormat = false;
+                mockSettingsManager.settings.showSeconds = true;
+                
+                const result = timeController.formatTime(testDate);
+                
+                expect(result.timeString).toBe('02:30:45');
+                expect(result.ampm).toBe('PM');
+                expect(result.use24Hour).toBe(false);
+                expect(result.showSeconds).toBe(true);
+            });
+            
+            test('should format time in 24-hour format correctly', () => {
+                const testDate = new Date('2025-10-14T14:30:45');
+                mockSettingsManager.settings.use24HourFormat = true;
+                mockSettingsManager.settings.showSeconds = true;
+                
+                const result = timeController.formatTime(testDate);
+                
+                expect(result.timeString).toBe('14:30:45');
+                expect(result.ampm).toBe('');
+                expect(result.use24Hour).toBe(true);
+                expect(result.showSeconds).toBe(true);
+            });
+            
+            test('should handle midnight in 12-hour format', () => {
+                const testDate = new Date('2025-10-14T00:00:00');
+                mockSettingsManager.settings.use24HourFormat = false;
+                
+                const result = timeController.formatTime(testDate);
+                
+                expect(result.timeString).toContain('12:00');
+                expect(result.ampm).toBe('AM');
+            });
+        });
+
+        describe('Seconds Visibility Toggle', () => {
+            test('should toggle seconds display setting', () => {
+                mockSettingsManager.settings.showSeconds = true;
+                
+                const result = timeController.toggleSecondsDisplay();
+                
+                expect(result).toBe(false);
+                expect(mockSettingsManager.settings.showSeconds).toBe(false);
+            });
+        });
+
+        describe('Date Formatting', () => {
+            test('should format date in correct format', () => {
+                const testDate = new Date('2025-10-14T15:30:00');
+                
+                const result = timeController.formatDate(testDate);
+                
+                expect(result.dateString).toBe('Tuesday, 14 October, 2025, week 42');
+                expect(result.dayName).toBe('Tuesday');
+                expect(result.day).toBe(14);
+                expect(result.monthName).toBe('October');
+                expect(result.year).toBe(2025);
+            });
+        });
+        
+        // Global test runner functions
+        window.runAllTests = async function() {
+            const resultsDiv = document.getElementById('test-results');
+            const summaryDiv = document.getElementById('test-summary');
+            
+            resultsDiv.innerHTML = '<p>Running tests...</p>';
+            
+            const results = await testFramework.runTests();
+            
+            let html = '';
+            let passCount = 0;
+            let failCount = 0;
+            
+            results.forEach(result => {
+                const className = result.status === 'pass' ? 'test-pass' : 'test-fail';
+                const status = result.status === 'pass' ? '✓ PASS' : '✗ FAIL';
+                const error = result.error ? `<br><small>Error: ${result.error}</small>` : '';
+                
+                html += `<div class="test-result ${className}">
+                    <strong>${status}</strong>: ${result.description}${error}
+                </div>`;
+                
+                if (result.status === 'pass') {
+                    passCount++;
+                } else {
+                    failCount++;
+                }
+            });
+            
+            resultsDiv.innerHTML = html;
+            
+            const total = passCount + failCount;
+            const successRate = total > 0 ? Math.round((passCount / total) * 100) : 0;
+            
+            summaryDiv.innerHTML = `
+                <div class="test-summary">
+                    <h3>Test Summary</h3>
+                    <p><strong>Total Tests:</strong> ${total}</p>
+                    <p><strong>Passed:</strong> ${passCount}</p>
+                    <p><strong>Failed:</strong> ${failCount}</p>
+                    <p><strong>Success Rate:</strong> ${successRate}%</p>
+                </div>
+            `;
+        };
+        
+        window.clearResults = function() {
+            document.getElementById('test-results').innerHTML = '';
+            document.getElementById('test-summary').innerHTML = '';
+        };
+    </script>
+</body>
+</html>
