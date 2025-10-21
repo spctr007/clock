@@ -236,6 +236,28 @@
         }
     }
     
+    // Show error message using Bootstrap toast if available
+    function showError(message) {
+        const errorElement = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        
+        if (errorElement && errorText) {
+            errorText.textContent = message;
+            
+            // Try to use Bootstrap toast if available
+            if (window.bootstrap && bootstrap.Toast) {
+                const toast = new bootstrap.Toast(errorElement);
+                toast.show();
+            } else {
+                // Fallback to simple show/hide
+                errorElement.hidden = false;
+                setTimeout(() => {
+                    errorElement.hidden = true;
+                }, 5000);
+            }
+        }
+    }
+    
     // Initialize the application
     function init() {
         console.log('Initializing mobile fallback app...');

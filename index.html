@@ -11,143 +11,164 @@
     <meta name="author" content="Time Display Webapp">
     <meta name="theme-color" content="#000000">
     <title>Time Display</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Custom CSS (loaded after Bootstrap to override) -->
     <link rel="stylesheet" href="styles/main.css">
 </head>
 
 <body>
     <main class="app-container">
-        <header class="app-header">
-            <h1 class="visually-hidden">Time Display Application</h1>
-        </header>
+        <div class="container-fluid h-100">
+            <header class="app-header">
+                <h1 class="visually-hidden">Time Display Application</h1>
+            </header>
 
-        <section class="christmas-countdown" id="christmasCountdown">
-            <span class="countdown-text" id="countdownText">🎄 Loading...</span>
-        </section>
+            <div class="row h-100 justify-content-center align-items-center">
+                <div class="col-12 col-lg-10 col-xl-8">
+                    <section class="christmas-countdown text-center mb-4" id="christmasCountdown">
+                        <span class="countdown-text" id="countdownText">🎄 Loading...</span>
+                    </section>
 
-        <section class="time-display-section" aria-live="polite" aria-label="Current time display">
-            <div class="time-display" id="timeDisplay">
-                <span class="time-text" id="timeText">--:--</span>
-                <span class="ampm-text" id="ampmText"></span>
+                    <section class="time-display-section text-center" aria-live="polite" aria-label="Current time display">
+                        <div class="time-display d-flex justify-content-center align-items-baseline flex-wrap mb-4" id="timeDisplay">
+                            <span class="time-text" id="timeText">--:--</span>
+                            <span class="ampm-text ms-2" id="ampmText"></span>
+                        </div>
+                        <div class="date-display mb-4" id="dateDisplay">
+                            <span class="date-text" id="dateText">Loading date...</span>
+                        </div>
+                        <div class="connection-status d-flex justify-content-center align-items-center" id="connectionStatus" aria-live="polite">
+                            <span class="status-indicator me-2" id="statusIndicator"></span>
+                            <span class="status-text" id="statusText">Loading...</span>
+                        </div>
+                    </section>
+                </div>
             </div>
-            <div class="date-display" id="dateDisplay">
-                <span class="date-text" id="dateText">Loading date...</span>
-            </div>
-            <div class="connection-status" id="connectionStatus" aria-live="polite">
-                <span class="status-indicator" id="statusIndicator"></span>
-                <span class="status-text" id="statusText">Loading...</span>
-            </div>
-        </section>
+        </div>
 
-        <aside class="settings-panel" id="settingsPanel" aria-label="Time display settings">
-            <button class="settings-toggle" id="settingsToggle" aria-expanded="false" aria-controls="settingsContent">
+        <aside class="settings-panel position-fixed" id="settingsPanel" aria-label="Time display settings">
+            <button class="settings-toggle btn btn-outline-light rounded-circle" id="settingsToggle" aria-expanded="false" aria-controls="settingsContent">
                 <span class="visually-hidden">Toggle settings</span>
                 <span class="settings-icon">⚙️</span>
             </button>
 
-            <div class="settings-content" id="settingsContent" hidden>
-                <div class="settings-group">
-                    <h2 class="settings-title">Display Settings</h2>
+            <div class="settings-content card bg-dark border-secondary" id="settingsContent" hidden>
+                <div class="card-body">
+                    <div class="settings-group mb-4">
+                        <h5 class="settings-title card-title text-light mb-3">Display Settings</h5>
 
-                    <div class="setting-item">
-                        <label class="setting-label">
-                            <input type="checkbox" id="showSeconds" class="setting-checkbox">
-                            <span class="checkbox-text">Show seconds</span>
-                        </label>
-                    </div>
-
-                    <div class="setting-item">
-                        <label class="setting-label">
-                            <input type="checkbox" id="use24Hour" class="setting-checkbox">
-                            <span class="checkbox-text">24-hour format</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="settings-group">
-                    <h2 class="settings-title">World Clocks</h2>
-
-                    <div class="setting-item">
-                        <label class="setting-label">
-                            <input type="checkbox" id="showWorldClocks" class="setting-checkbox">
-                            <span class="checkbox-text">Show world clocks</span>
-                        </label>
-                    </div>
-
-                    <div class="world-clock-settings" id="worldClockSettings">
-                        <div class="world-clock-list" id="worldClockList">
-                            <!-- World clock items will be dynamically added here -->
+                        <div class="form-check mb-3">
+                            <input type="checkbox" id="showSeconds" class="form-check-input">
+                            <label class="form-check-label text-light" for="showSeconds">
+                                Show seconds
+                            </label>
                         </div>
 
-                        <div class="add-world-clock" id="addWorldClockSection">
-                            <select id="timezoneSelect" class="timezone-select">
-                                <option value="">Select a timezone...</option>
-                                <option value="America/New_York">New York (EST/EDT)</option>
-                                <option value="America/Los_Angeles">Los Angeles (PST/PDT)</option>
-                                <option value="America/Chicago">Chicago (CST/CDT)</option>
-                                <option value="America/Denver">Denver (MST/MDT)</option>
-                                <option value="Europe/London">London (GMT/BST)</option>
-                                <option value="Europe/Paris">Paris (CET/CEST)</option>
-                                <option value="Europe/Monaco">Monaco (CET/CEST)</option>
-                                <option value="Europe/Berlin">Berlin (CET/CEST)</option>
-                                <option value="Europe/Rome">Rome (CET/CEST)</option>
-                                <option value="Europe/Madrid">Madrid (CET/CEST)</option>
-                                <option value="Asia/Tokyo">Tokyo (JST)</option>
-                                <option value="Asia/Shanghai">Shanghai (CST)</option>
-                                <option value="Asia/Hong_Kong">Hong Kong (HKT)</option>
-                                <option value="Asia/Singapore">Singapore (SGT)</option>
-                                <option value="Asia/Dubai">Dubai (GST)</option>
-                                <option value="Asia/Kolkata">Mumbai (IST)</option>
-                                <option value="Australia/Sydney">Sydney (AEST/AEDT)</option>
-                                <option value="Australia/Melbourne">Melbourne (AEST/AEDT)</option>
-                                <option value="Pacific/Auckland">Auckland (NZST/NZDT)</option>
-                                <option value="America/Sao_Paulo">São Paulo (BRT/BRST)</option>
-                                <option value="America/Mexico_City">Mexico City (CST/CDT)</option>
-                            </select>
-                            <button id="addWorldClockBtn" class="add-clock-button" disabled>
-                                Add World Clock
-                            </button>
+                        <div class="form-check mb-3">
+                            <input type="checkbox" id="use24Hour" class="form-check-input">
+                            <label class="form-check-label text-light" for="use24Hour">
+                                24-hour format
+                            </label>
                         </div>
                     </div>
-                </div>
 
-                <div class="settings-group">
-                    <h2 class="settings-title">Background</h2>
+                    <div class="settings-group mb-4">
+                        <h5 class="settings-title card-title text-light mb-3">World Clocks</h5>
 
-                    <div class="setting-item">
-                        <label for="backgroundUpload" class="upload-label">
-                            Upload Background
-                        </label>
-                        <input type="file" id="backgroundUpload" class="file-input" accept="image/*">
+                        <div class="form-check mb-3">
+                            <input type="checkbox" id="showWorldClocks" class="form-check-input">
+                            <label class="form-check-label text-light" for="showWorldClocks">
+                                Show world clocks
+                            </label>
+                        </div>
+
+                        <div class="world-clock-settings" id="worldClockSettings">
+                            <div class="world-clock-list mb-3" id="worldClockList">
+                                <!-- World clock items will be dynamically added here -->
+                            </div>
+
+                            <div class="add-world-clock" id="addWorldClockSection">
+                                <select id="timezoneSelect" class="form-select form-select-sm bg-dark text-light border-secondary mb-2">
+                                    <option value="">Select a timezone...</option>
+                                    <option value="America/New_York">New York (EST/EDT)</option>
+                                    <option value="America/Los_Angeles">Los Angeles (PST/PDT)</option>
+                                    <option value="America/Chicago">Chicago (CST/CDT)</option>
+                                    <option value="America/Denver">Denver (MST/MDT)</option>
+                                    <option value="Europe/London">London (GMT/BST)</option>
+                                    <option value="Europe/Paris">Paris (CET/CEST)</option>
+                                    <option value="Europe/Monaco">Monaco (CET/CEST)</option>
+                                    <option value="Europe/Berlin">Berlin (CET/CEST)</option>
+                                    <option value="Europe/Rome">Rome (CET/CEST)</option>
+                                    <option value="Europe/Madrid">Madrid (CET/CEST)</option>
+                                    <option value="Asia/Tokyo">Tokyo (JST)</option>
+                                    <option value="Asia/Shanghai">Shanghai (CST)</option>
+                                    <option value="Asia/Hong_Kong">Hong Kong (HKT)</option>
+                                    <option value="Asia/Singapore">Singapore (SGT)</option>
+                                    <option value="Asia/Dubai">Dubai (GST)</option>
+                                    <option value="Asia/Kolkata">Mumbai (IST)</option>
+                                    <option value="Australia/Sydney">Sydney (AEST/AEDT)</option>
+                                    <option value="Australia/Melbourne">Melbourne (AEST/AEDT)</option>
+                                    <option value="Pacific/Auckland">Auckland (NZST/NZDT)</option>
+                                    <option value="America/Sao_Paulo">São Paulo (BRT/BRST)</option>
+                                    <option value="America/Mexico_City">Mexico City (CST/CDT)</option>
+                                </select>
+                                <button id="addWorldClockBtn" class="btn btn-outline-primary btn-sm w-100" disabled>
+                                    Add World Clock
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="setting-item">
-                        <label for="opacitySlider" class="setting-label">
-                            Background Opacity
-                        </label>
-                        <input type="range" id="opacitySlider" class="opacity-slider" min="0" max="100" value="50"
-                            aria-valuemin="0" aria-valuemax="100">
-                        <span class="opacity-value" id="opacityValue">50%</span>
-                    </div>
+                    <div class="settings-group">
+                        <h5 class="settings-title card-title text-light mb-3">Background</h5>
 
-                    <button class="reset-button" id="resetBackground">
-                        Reset to Default
-                    </button>
+                        <div class="mb-3">
+                            <label for="backgroundUpload" class="form-label text-light">
+                                Upload Background
+                            </label>
+                            <input type="file" id="backgroundUpload" class="form-control form-control-sm bg-dark text-light border-secondary" accept="image/*">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="opacitySlider" class="form-label text-light">
+                                Background Opacity: <span class="opacity-value" id="opacityValue">50%</span>
+                            </label>
+                            <input type="range" id="opacitySlider" class="form-range" min="0" max="100" value="50"
+                                aria-valuemin="0" aria-valuemax="100">
+                        </div>
+
+                        <button class="btn btn-outline-danger btn-sm w-100" id="resetBackground">
+                            Reset to Default
+                        </button>
+                    </div>
                 </div>
             </div>
         </aside>
 
         <div class="background-overlay" id="backgroundOverlay"></div>
         
-        <section class="world-clocks-section" id="worldClocksSection" aria-label="World clocks" hidden>
-            <div class="world-clocks-container" id="worldClocksContainer">
-                <!-- World clock displays will be dynamically added here -->
+        <section class="world-clocks-section container-fluid mt-4" id="worldClocksSection" aria-label="World clocks" hidden>
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-10">
+                    <div class="world-clocks-container row g-3" id="worldClocksContainer">
+                        <!-- World clock displays will be dynamically added here -->
+                    </div>
+                </div>
             </div>
         </section>
     </main>
 
-    <div class="error-message" id="errorMessage" role="alert" hidden>
-        <span class="error-text" id="errorText"></span>
-        <button class="error-close" id="errorClose" aria-label="Close error message">×</button>
+    <!-- Error Toast -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3">
+        <div class="toast align-items-center text-bg-danger border-0" id="errorMessage" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="errorText">
+                    Error message will appear here
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" id="errorClose" aria-label="Close"></button>
+            </div>
+        </div>
     </div>
 
     <!-- JavaScript Modules -->
@@ -483,7 +504,15 @@
                 errorClose.addEventListener('click', function () {
                     const errorMessage = document.getElementById('errorMessage');
                     if (errorMessage) {
-                        errorMessage.hidden = true;
+                        // Try to use Bootstrap toast if available
+                        if (window.bootstrap && bootstrap.Toast) {
+                            const toast = bootstrap.Toast.getInstance(errorMessage);
+                            if (toast) {
+                                toast.hide();
+                            }
+                        } else {
+                            errorMessage.hidden = true;
+                        }
                     }
                 });
             }
@@ -544,14 +573,14 @@
             
             worldClocks.forEach(function(worldClock) {
                 const item = document.createElement('div');
-                item.className = 'world-clock-item';
+                item.className = 'world-clock-item d-flex justify-content-between align-items-center p-2 mb-2 bg-dark border border-secondary rounded';
                 item.innerHTML = 
-                    '<div class="world-clock-info">' +
-                        '<div class="world-clock-city">' + worldClock.cityName + '</div>' +
-                        '<div class="world-clock-timezone">' + worldClock.timezone + '</div>' +
+                    '<div class="world-clock-info flex-grow-1">' +
+                        '<div class="world-clock-city text-light fw-medium">' + worldClock.cityName + '</div>' +
+                        '<div class="world-clock-timezone text-muted small">' + worldClock.timezone + '</div>' +
                     '</div>' +
                     '<div class="world-clock-controls">' +
-                        '<button class="world-clock-remove" onclick="removeWorldClock(\'' + worldClock.id + '\')" aria-label="Remove ' + worldClock.cityName + ' world clock">×</button>' +
+                        '<button class="btn btn-outline-danger btn-sm" onclick="removeWorldClock(\'' + worldClock.id + '\')" aria-label="Remove ' + worldClock.cityName + ' world clock">×</button>' +
                     '</div>';
                 
                 worldClockList.appendChild(item);
@@ -569,14 +598,21 @@
                 worldClocksContainer.innerHTML = '';
                 
                 worldClocks.forEach(function(worldClock) {
-                    const display = document.createElement('div');
-                    display.className = 'world-clock-display';
-                    display.innerHTML = 
-                        '<div class="world-clock-city-name">' + worldClock.cityName + '</div>' +
-                        '<div class="world-clock-time" id="worldClock_' + worldClock.id + '_time">--:--</div>' +
-                        '<div class="world-clock-date" id="worldClock_' + worldClock.id + '_date">Loading...</div>';
+                    // Create Bootstrap column
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'col-12 col-md-6 col-lg-4';
                     
-                    worldClocksContainer.appendChild(display);
+                    const display = document.createElement('div');
+                    display.className = 'world-clock-display card bg-dark border-secondary h-100';
+                    display.innerHTML = 
+                        '<div class="card-body text-center">' +
+                            '<h6 class="world-clock-city-name card-title text-light">' + worldClock.cityName + '</h6>' +
+                            '<div class="world-clock-time h4 text-light mb-2" id="worldClock_' + worldClock.id + '_time">--:--</div>' +
+                            '<div class="world-clock-date text-muted small" id="worldClock_' + worldClock.id + '_date">Loading...</div>' +
+                        '</div>';
+                    
+                    colDiv.appendChild(display);
+                    worldClocksContainer.appendChild(colDiv);
                 });
                 
                 updateWorldClockTimes();
@@ -791,6 +827,9 @@
             event.preventDefault();
         });
     </script>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 
 </html>

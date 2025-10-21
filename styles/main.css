@@ -1,29 +1,28 @@
-/* CSS Reset and Base Styles */
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-html {
-    font-size: 16px;
-    line-height: 1.5;
-    -webkit-text-size-adjust: 100%;
-    -moz-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-}
-
+/* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
 
+/* Bootstrap Overrides and Custom Styles */
+:root {
+    --bs-body-font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --bs-body-bg: #000;
+    --bs-body-color: #fff;
+    --bs-dark: #1a1a2e;
+    --bs-secondary: rgba(255, 255, 255, 0.15);
+}
+
+/* Override Bootstrap's body styles */
 body {
-    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: #000;
-    color: #fff;
+    font-family: var(--bs-body-font-family) !important;
+    background-color: var(--bs-body-bg) !important;
+    color: var(--bs-body-color) !important;
     overflow: hidden;
     height: 100vh;
     width: 100vw;
+}
+
+/* Ensure Bootstrap container fills height */
+.container-fluid.h-100 {
+    min-height: 100vh;
 }
 
 /* Remove default button and input styles */
@@ -56,26 +55,21 @@ button {
     border: 0;
 }
 
-/* Main App Container - time.is inspired layout */
+/* Main App Container - Bootstrap enhanced */
 .app-container {
     position: relative;
     width: 100vw;
     height: 100vh;
-    display: grid;
-    grid-template-rows: 1fr auto auto;
-    grid-template-areas:
-        "main"
-        "world-clocks"
-        "footer";
-    justify-items: center;
-    align-content: center;
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     background-attachment: fixed;
     background-size: 400% 400%;
     animation: gradientShift 20s ease infinite;
     overflow: hidden;
-    padding: 2rem 1rem;
-    box-sizing: border-box;
+}
+
+/* Bootstrap row override for full height */
+.app-container .row.h-100 {
+    min-height: 100vh;
 }
 
 /* Subtle gradient animation for default background - time.is inspired */
@@ -141,21 +135,14 @@ button {
     transition: opacity 0.3s ease;
 }
 
-/* Time Display Section - time.is inspired */
+/* Time Display Section - Bootstrap enhanced */
 .time-display-section {
     position: relative;
     z-index: 2;
-    text-align: center;
-    margin-bottom: 3rem;
-    padding: 0 1rem;
 }
 
 .time-display {
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
     gap: 0.75rem;
-    margin-bottom: 1.5rem;
     transition: all 0.3s ease;
 }
 
@@ -278,23 +265,16 @@ button {
     }
 }
 
-/* World Clocks Section - time.is inspired layout */
+/* World Clocks Section - Bootstrap enhanced */
 .world-clocks-section {
     position: relative;
     z-index: 2;
-    grid-area: world-clocks;
-    width: 100%;
-    max-width: 1200px;
-    margin: 2rem 0;
     animation: fadeInUp 0.8s ease 0.3s both;
 }
 
-.world-clocks-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    padding: 0 2rem;
-    justify-items: center;
+/* World clock items will be Bootstrap columns */
+.world-clock-display {
+    /* This will be applied to Bootstrap col elements */
 }
 
 .world-clock-display {
@@ -427,37 +407,32 @@ button {
     animation: pulse 1s infinite;
 }
 
-/* Settings Panel - time.is inspired minimalist design */
+/* Settings Panel - Bootstrap enhanced */
 .settings-panel {
-    position: fixed;
     top: 2rem;
     right: 2rem;
-    z-index: 10;
+    z-index: 1050; /* Bootstrap z-index for modals */
     animation: fadeInUp 1s ease 0.5s both;
 }
 
 .settings-toggle {
     width: 3.5rem;
     height: 3.5rem;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.08) !important;
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
     font-size: 1.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .settings-toggle:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.15) !important;
     transform: scale(1.1) rotate(90deg);
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.3) !important;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    color: #ffffff !important;
 }
 
 .settings-toggle:active {
@@ -469,11 +444,9 @@ button {
     top: 4.5rem;
     right: 0;
     width: 320px;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.85) !important;
     backdrop-filter: blur(30px);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
     transform: translateY(-20px) scale(0.95);
     opacity: 0;
     visibility: hidden;
@@ -1880,4 +1853,172 @@ ile touch optimizations */
         right: -0.5rem;
         left: 0.5rem;
     }
+}/*
+ Bootstrap Component Overrides */
+
+/* Form controls in dark theme */
+.form-control.bg-dark {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+}
+
+.form-control.bg-dark:focus {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
+    color: #fff !important;
+}
+
+.form-select.bg-dark {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+}
+
+.form-select.bg-dark:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Form check (checkboxes) in dark theme */
+.form-check-input {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.form-check-input:checked {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+}
+
+.form-check-input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Range slider in dark theme */
+.form-range {
+    background: transparent;
+}
+
+.form-range::-webkit-slider-track {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-radius: 0.5rem;
+    height: 0.5rem;
+}
+
+.form-range::-webkit-slider-thumb {
+    background: #3b82f6 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    width: 1rem !important;
+    height: 1rem !important;
+}
+
+.form-range::-moz-range-track {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-radius: 0.5rem;
+    height: 0.5rem;
+    border: none;
+}
+
+.form-range::-moz-range-thumb {
+    background: #3b82f6 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 1rem !important;
+    height: 1rem !important;
+}
+
+/* Card overrides for world clocks */
+.world-clock-display.card {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.world-clock-display.card:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    transform: translateY(-4px) scale(1.02);
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Toast overrides */
+.toast.text-bg-danger {
+    background: rgba(239, 68, 68, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Button overrides */
+.btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.btn-outline-primary {
+    border-color: rgba(59, 130, 246, 0.5) !important;
+    color: rgba(59, 130, 246, 0.9) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.7) !important;
+    color: #3b82f6 !important;
+}
+
+.btn-outline-danger {
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    color: rgba(239, 68, 68, 0.9) !important;
+}
+
+.btn-outline-danger:hover {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.7) !important;
+    color: #ef4444 !important;
+}
+
+/* Bootstrap responsive utilities for better mobile experience */
+@media (max-width: 576px) {
+    .settings-content {
+        width: calc(100vw - 2rem) !important;
+        right: -1rem !important;
+        left: 1rem !important;
+    }
+    
+    .world-clocks-container .col-12 {
+        margin-bottom: 1rem;
+    }
+    
+    .time-display {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+    
+    .ampm-text {
+        margin-left: 0 !important;
+        margin-top: -0.5rem;
+    }
+}
+
+/* Ensure Bootstrap utilities work with our custom styles */
+.text-light {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.bg-dark {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.border-secondary {
+    border-color: rgba(255, 255, 255, 0.15) !important;
 }
