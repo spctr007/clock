@@ -166,7 +166,7 @@ button {
     text-align: center;
     width: auto;
     margin: 0 auto;
-    transform: translateX(-1.5rem);
+    transform: translateX(-3rem);
 }
 
 .time-text:hover {
@@ -183,7 +183,7 @@ button {
     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
     color: #ffffff;
     display: inline;
-    margin-left: 0.05em;
+    margin-left: -0.1em;
     padding-left: 0;
     vertical-align: baseline;
     position: relative;
