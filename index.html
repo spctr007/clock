@@ -31,9 +31,8 @@
                     </section>
 
                     <section class="time-display-section text-center" aria-live="polite" aria-label="Current time display">
-                        <div class="time-display d-flex justify-content-center align-items-baseline flex-wrap mb-4" id="timeDisplay">
+                        <div class="time-display text-center mb-4" id="timeDisplay">
                             <span class="time-text" id="timeText">--:--</span>
-                            <span class="ampm-text ms-2" id="ampmText"></span>
                         </div>
                         <div class="date-display mb-4" id="dateDisplay">
                             <span class="date-text" id="dateText">Loading date...</span>
@@ -369,17 +368,12 @@
                     timeString += ':' + formattedSeconds;
                 }
 
-                timeElement.textContent = timeString;
-
-                // Update AM/PM
-                if (ampmElement) {
-                    if (!use24Hour && ampm) {
-                        ampmElement.textContent = ampm;
-                        ampmElement.style.display = 'inline';
-                    } else {
-                        ampmElement.style.display = 'none';
-                    }
+                // Add AM/PM to the same span with smaller styling
+                if (!use24Hour && ampm) {
+                    timeString += ' <span class="ampm-text">' + ampm + '</span>';
                 }
+
+                timeElement.innerHTML = timeString;
 
                 // Format date with week number
                 const weekdayOptions = { weekday: 'long' };

@@ -117,17 +117,12 @@
             timeString += ':' + formattedSeconds;
         }
         
-        timeElement.textContent = timeString;
-        
-        // Update AM/PM
-        if (ampmElement) {
-            if (!settings.use24Hour && ampm) {
-                ampmElement.textContent = ampm;
-                ampmElement.style.display = 'inline';
-            } else {
-                ampmElement.style.display = 'none';
-            }
+        // Add AM/PM to the same span with smaller styling
+        if (!settings.use24Hour && ampm) {
+            timeString += ' <span class="ampm-text">' + ampm + '</span>';
         }
+        
+        timeElement.innerHTML = timeString;
         
         // Format date with week number
         const weekdayOptions = { weekday: 'long' };

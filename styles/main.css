@@ -148,7 +148,7 @@ button {
 
 .time-text {
     font-family: 'Montserrat', sans-serif;
-    font-size: clamp(6rem, 20vw, 12rem) !important;
+    font-size: clamp(8rem, 25vw, 16rem) !important;
     line-height: 0.9;
     font-weight: 800;
     letter-spacing: -0.01em;
@@ -172,20 +172,13 @@ button {
 
 .ampm-text {
     font-family: 'Montserrat', sans-serif;
-    font-size: clamp(3rem, 10vw, 6rem) !important; /* Half of time-text size */
+    font-size: 0.5em; /* Half of parent time-text size */
     font-weight: 800;
     opacity: 1 !important;
     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
     color: #ffffff;
-    transition: all 0.3s ease;
-    display: inline-block;
-    background: rgba(0, 0, 0, 0.0);
-    padding: 0.25rem 0.5rem;
-    border-radius: 8px;
-    backdrop-filter: blur(10px);
-    position: relative;
-    z-index: 11;
-    margin-left: 0.5rem;
+    display: inline;
+    margin-left: 0.25em;
     vertical-align: baseline;
 }
 
@@ -1241,9 +1234,7 @@ button {
         font-size: clamp(4rem, 18vw, 8rem) !important;
     }
 
-    .ampm-text {
-        font-size: clamp(2rem, 9vw, 4rem) !important; /* Half of mobile time-text size */
-    }
+    /* AM/PM now scales automatically with parent time-text */
 
     .date-text {
         font-size: clamp(1rem, 4vw, 1.4rem);
@@ -1291,12 +1282,7 @@ button {
         flex-wrap: nowrap;
     }
 
-    .ampm-text {
-        font-size: clamp(1.5rem, 7.5vw, 3rem) !important; /* Half of extra small time-text size */
-        margin-top: 0;
-        margin-left: 0.25rem;
-        padding: 0.125rem 0.25rem;
-    }
+    /* AM/PM now scales automatically with parent time-text */
 
     /* Extra small mobile adjustments */
     .time-text {
@@ -2048,10 +2034,7 @@ ile touch optimizations */
         flex-wrap: nowrap !important;
     }
 
-    .ampm-text {
-        margin-left: 0.25rem !important;
-        margin-top: 0 !important;
-    }
+    /* AM/PM now scales automatically with parent time-text */
 }
 
 /* Ensure Bootstrap utilities work with our custom styles */
