@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AM/PM Alignment Test</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 2rem;
+        }
+        
+        .time-display {
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .time-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(10rem, 30vw, 19rem) !important;
+            line-height: 0.9;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
+            font-variant-numeric: tabular-nums;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.0);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 11;
+        }
+
+        .ampm-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(5rem, 15vw, 9.5rem) !important; /* Half of time-text size */
+            font-weight: 800;
+            opacity: 1 !important;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+            transition: all 0.3s ease;
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.0);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 11;
+            margin-left: 0.5rem;
+            vertical-align: baseline;
+        }
+        
+        .test-controls {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .test-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .test-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .info {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            opacity: 0.7;
+            text-align: center;
+            max-width: 600px;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .time-display {
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+                flex-wrap: nowrap; /* Keep on same line */
+            }
+            
+            .time-text {
+                font-size: clamp(6rem, 25vw, 12rem) !important;
+            }
+            
+            .ampm-text {
+                font-size: clamp(3rem, 12.5vw, 6rem) !important; /* Half of mobile time-text size */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .time-display {
+                flex-direction: row; /* Keep on same line */
+                align-items: baseline;
+                justify-content: center;
+                gap: 0.25rem;
+                flex-wrap: nowrap;
+            }
+
+            .ampm-text {
+                font-size: clamp(2rem, 10vw, 4rem) !important; /* Half of extra small time-text size */
+                margin-top: 0;
+                margin-left: 0.25rem;
+            }
+
+            .time-text {
+                font-size: clamp(4rem, 20vw, 8rem) !important;
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>AM/PM Alignment Test</h1>
+    
+    <div class="time-display d-flex justify-content-center align-items-baseline flex-wrap mb-4">
+        <span class="time-text" id="timeText">--:--</span>
+        <span class="ampm-text ms-2" id="ampmText">AM</span>
+    </div>
+    
+    <div class="test-controls">
+        <button class="test-button" onclick="toggle24Hour()">Toggle 12/24 Hour</button>
+        <button class="test-button" onclick="updateTime()">Refresh Time</button>
+    </div>
+    
+    <div class="info">
+        <p><strong>AM/PM Alignment:</strong> Should be on the same line as the clock</p>
+        <p><strong>Font Size:</strong> AM/PM is exactly half the size of the clock digits</p>
+        <p><strong>Responsive:</strong> Maintains same-line alignment on all screen sizes</p>
+        <p>Current screen width: <span id="screenWidth">--</span>px</p>
+    </div>
+
+    <script>
+        let use24Hour = false;
+        
+        function updateTime() {
+            const now = new Date();
+            const timeElement = document.getElementById('timeText');
+            const ampmElement = document.getElementById('ampmText');
+            
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+            let ampm = '';
+            
+            if (!use24Hour) {
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                if (hours === 0) hours = 12;
+            }
+            
+            const formattedHours = hours.toString().padStart(2, '0');
+            const formattedMinutes = minutes.toString().padStart(2, '0');
+            const timeString = formattedHours + ':' + formattedMinutes;
+            
+            timeElement.textContent = timeString;
+            
+            if (!use24Hour && ampm) {
+                ampmElement.textContent = ampm;
+                ampmElement.style.display = 'inline-block';
+            } else {
+                ampmElement.style.display = 'none';
+            }
+        }
+        
+        function toggle24Hour() {
+            use24Hour = !use24Hour;
+            updateTime();
+            console.log('24-hour format:', use24Hour);
+        }
+        
+        function updateScreenWidth() {
+            document.getElementById('screenWidth').textContent = window.innerWidth;
+        }
+        
+        // Initialize
+        updateTime();
+        updateScreenWidth();
+        
+        // Update every second
+        setInterval(updateTime, 1000);
+        
+        // Update screen width on resize
+        window.addEventListener('resize', updateScreenWidth);
+        
+        console.log('AM/PM alignment test loaded');
+    </script>
+</body>
+</html>
