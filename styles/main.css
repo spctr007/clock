@@ -217,6 +217,17 @@ button {
     transform: translateY(-2px);
 }
 
+/* Date highlight styling for month, date, year */
+.date-highlight {
+    color: #fbbf24; /* Yellow color */
+    font-weight: 500;
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.6),
+        0 0 10px rgba(251, 191, 36, 0.3),
+        0 0 20px rgba(251, 191, 36, 0.1);
+    display: inline;
+}
+
 /* Christmas Countdown */
 .christmas-countdown {
     margin-bottom: 2rem;

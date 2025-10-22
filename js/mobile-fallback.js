@@ -130,16 +130,17 @@
         }
         
         // Format date with week number
-        const options = {
-            weekday: 'long',
+        const weekdayOptions = { weekday: 'long' };
+        const dateOptions = {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         };
-        const baseDateString = now.toLocaleDateString('en-US', options);
+        const weekdayString = now.toLocaleDateString('en-US', weekdayOptions);
+        const dateOnlyString = now.toLocaleDateString('en-US', dateOptions);
         const weekNumber = getWeekNumber(now);
-        const dateString = baseDateString + ', week ' + weekNumber;
-        dateElement.textContent = dateString;
+        const dateString = weekdayString + ', <span class="date-highlight">' + dateOnlyString + '</span>, week ' + weekNumber;
+        dateElement.innerHTML = dateString;
         
         // Update Christmas countdown
         updateChristmasCountdown();

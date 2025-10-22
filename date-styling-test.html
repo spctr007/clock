@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Styling Test</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 2rem;
+        }
+        
+        .time-display {
+            font-size: clamp(4rem, 15vw, 8rem);
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .date-display {
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .date-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 400;
+            opacity: 1 !important;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
+            letter-spacing: 0.02em;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.0);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 11;
+        }
+
+        .date-text:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        /* Date highlight styling for month, date, year */
+        .date-highlight {
+            color: #fbbf24; /* Yellow color */
+            font-weight: 500;
+            text-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.6),
+                0 0 10px rgba(251, 191, 36, 0.3),
+                0 0 20px rgba(251, 191, 36, 0.1);
+            display: inline;
+        }
+        
+        .test-controls {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .test-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .test-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .info {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            opacity: 0.7;
+            text-align: center;
+            max-width: 600px;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 480px) {
+            .date-text {
+                font-size: clamp(0.875rem, 3.5vw, 1.2rem);
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Date Styling Test</h1>
+    
+    <div class="time-display" id="timeDisplay">--:--</div>
+    
+    <div class="date-display">
+        <span class="date-text" id="dateText">Loading date...</span>
+    </div>
+    
+    <div class="test-controls">
+        <button class="test-button" onclick="updateDateTime()">Refresh Date/Time</button>
+        <button class="test-button" onclick="testDifferentDate()">Test Different Date</button>
+        <button class="test-button" onclick="testLongDate()">Test Long Month Name</button>
+    </div>
+    
+    <div class="info">
+        <p><strong>Date Format:</strong> Weekday, <span style="color: #fbbf24;">Month Date, Year</span>, week number</p>
+        <p>The month, date, and year portion is now highlighted in yellow with a subtle glow effect.</p>
+        <p>Example: Wednesday, <span style="color: #fbbf24;">October 22, 2025</span>, week 43</p>
+    </div>
+
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Update time
+            document.getElementById('timeDisplay').textContent = now.toLocaleTimeString();
+            
+            // Update date with yellow highlighting
+            const weekdayOptions = { weekday: 'long' };
+            const dateOptions = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            const weekdayString = now.toLocaleDateString('en-US', weekdayOptions);
+            const dateOnlyString = now.toLocaleDateString('en-US', dateOptions);
+            const weekNumber = getWeekNumber(now);
+            const dateString = weekdayString + ', <span class="date-highlight">' + dateOnlyString + '</span>, week ' + weekNumber;
+            document.getElementById('dateText').innerHTML = dateString;
+        }
+        
+        function testDifferentDate() {
+            const testDate = new Date('2025-12-25'); // Christmas
+            
+            const weekdayOptions = { weekday: 'long' };
+            const dateOptions = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            const weekdayString = testDate.toLocaleDateString('en-US', weekdayOptions);
+            const dateOnlyString = testDate.toLocaleDateString('en-US', dateOptions);
+            const weekNumber = getWeekNumber(testDate);
+            const dateString = weekdayString + ', <span class="date-highlight">' + dateOnlyString + '</span>, week ' + weekNumber;
+            document.getElementById('dateText').innerHTML = dateString;
+        }
+        
+        function testLongDate() {
+            const testDate = new Date('2025-09-30'); // September has a longer name
+            
+            const weekdayOptions = { weekday: 'long' };
+            const dateOptions = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            const weekdayString = testDate.toLocaleDateString('en-US', weekdayOptions);
+            const dateOnlyString = testDate.toLocaleDateString('en-US', dateOptions);
+            const weekNumber = getWeekNumber(testDate);
+            const dateString = weekdayString + ', <span class="date-highlight">' + dateOnlyString + '</span>, week ' + weekNumber;
+            document.getElementById('dateText').innerHTML = dateString;
+        }
+        
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+        
+        // Initialize
+        updateDateTime();
+        
+        // Update every second
+        setInterval(updateDateTime, 1000);
+        
+        console.log('Date styling test loaded');
+    </script>
+</body>
+</html>
