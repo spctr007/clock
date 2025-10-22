@@ -51,7 +51,8 @@
             text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
             color: #ffffff;
             display: inline;
-            margin-left: 0.25em;
+            margin-left: 0.3em;
+            padding-left: 0.2em;
             vertical-align: baseline;
         }
         
@@ -140,7 +141,7 @@
             
             // Add AM/PM to the same span with smaller styling
             if (!use24Hour && ampm) {
-                timeString += ' <span class="ampm-text">' + ampm + '</span>';
+                timeString += '&nbsp;<span class="ampm-text">' + ampm + '</span>';
             }
             
             timeElement.innerHTML = timeString;

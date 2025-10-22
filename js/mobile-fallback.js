@@ -119,7 +119,7 @@
         
         // Add AM/PM to the same span with smaller styling
         if (!settings.use24Hour && ampm) {
-            timeString += ' <span class="ampm-text">' + ampm + '</span>';
+            timeString += '&nbsp;<span class="ampm-text">' + ampm + '</span>';
         }
         
         timeElement.innerHTML = timeString;
