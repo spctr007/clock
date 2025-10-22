@@ -277,7 +277,6 @@ button {
             0 2px 4px rgba(0, 0, 0, 0.6),
             0 0 15px rgba(34, 197, 94, 0.4),
             0 0 30px rgba(34, 197, 94, 0.2);
-        transform: scale(1);
     }
 
     to {
@@ -285,7 +284,6 @@ button {
             0 2px 4px rgba(0, 0, 0, 0.6),
             0 0 20px rgba(34, 197, 94, 0.6),
             0 0 40px rgba(34, 197, 94, 0.3);
-        transform: scale(1.05);
     }
 }
 
