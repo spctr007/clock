@@ -166,6 +166,7 @@ button {
     text-align: center;
     width: auto;
     margin: 0 auto;
+    transform: translateX(-1.5rem);
 }
 
 .time-text:hover {
