@@ -2124,3 +2124,238 @@ trap Offcanvas Overrides for Mobile Settings */
         pointer-events: auto;
     }
 }
+
+/* ════════════════════════════════════════════
+   CHRISTMAS THEME OVERRIDES
+   ════════════════════════════════════════════ */
+
+/* Background: deep forest green */
+.app-container {
+    background: linear-gradient(180deg, #0d2b1a 0%, #1a472a 55%, #2d5a27 100%) !important;
+    animation: none !important;
+}
+
+/* Village & snow canvases */
+#village-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+#snow-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* String lights */
+.light-wire {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 18px;
+    border-bottom: 2px solid #2a2a2a;
+    z-index: 9;
+    pointer-events: none;
+}
+
+.lights-strand {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    z-index: 10;
+    padding: 0 1rem;
+    pointer-events: none;
+}
+
+.bulb-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bulb-wire {
+    width: 1px;
+    height: 14px;
+    background: #2a2a2a;
+}
+
+.bulb {
+    width: 13px;
+    height: 18px;
+    border-radius: 50% 50% 45% 45%;
+    position: relative;
+    animation: xmas-twinkle 1.5s ease-in-out infinite;
+}
+
+.bulb::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 3px;
+    width: 7px;
+    height: 6px;
+    background: #555;
+    border-radius: 2px 2px 0 0;
+}
+
+.bulb.red   { background: #e74c3c; box-shadow: 0 0 8px 3px rgba(231,76,60,0.7); }
+.bulb.green { background: #27ae60; box-shadow: 0 0 8px 3px rgba(39,174,96,0.7); }
+.bulb.gold  { background: #ffd700; box-shadow: 0 0 8px 3px rgba(255,215,0,0.7); }
+.bulb.blue  { background: #2980b9; box-shadow: 0 0 8px 3px rgba(41,128,185,0.7); }
+.bulb.white { background: #f0f0ff; box-shadow: 0 0 8px 3px rgba(220,220,255,0.7); }
+
+@keyframes xmas-twinkle {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.25; }
+}
+
+.bulb-wrap:nth-child(1)  .bulb { animation-delay: 0.00s; }
+.bulb-wrap:nth-child(2)  .bulb { animation-delay: 0.15s; }
+.bulb-wrap:nth-child(3)  .bulb { animation-delay: 0.30s; }
+.bulb-wrap:nth-child(4)  .bulb { animation-delay: 0.45s; }
+.bulb-wrap:nth-child(5)  .bulb { animation-delay: 0.60s; }
+.bulb-wrap:nth-child(6)  .bulb { animation-delay: 0.75s; }
+.bulb-wrap:nth-child(7)  .bulb { animation-delay: 0.90s; }
+.bulb-wrap:nth-child(8)  .bulb { animation-delay: 1.05s; }
+.bulb-wrap:nth-child(9)  .bulb { animation-delay: 1.20s; }
+.bulb-wrap:nth-child(10) .bulb { animation-delay: 1.35s; }
+.bulb-wrap:nth-child(11) .bulb { animation-delay: 0.20s; }
+.bulb-wrap:nth-child(12) .bulb { animation-delay: 0.35s; }
+.bulb-wrap:nth-child(13) .bulb { animation-delay: 0.50s; }
+.bulb-wrap:nth-child(14) .bulb { animation-delay: 0.65s; }
+.bulb-wrap:nth-child(15) .bulb { animation-delay: 0.80s; }
+.bulb-wrap:nth-child(16) .bulb { animation-delay: 0.95s; }
+.bulb-wrap:nth-child(17) .bulb { animation-delay: 1.10s; }
+.bulb-wrap:nth-child(18) .bulb { animation-delay: 1.25s; }
+.bulb-wrap:nth-child(19) .bulb { animation-delay: 1.40s; }
+.bulb-wrap:nth-child(20) .bulb { animation-delay: 0.05s; }
+
+/* Time: gold */
+.time-text {
+    color: #ffd700 !important;
+    text-shadow:
+        0 0 30px rgba(255,215,0,0.35),
+        0 0 60px rgba(255,215,0,0.15),
+        0 2px 6px rgba(0,0,0,0.7) !important;
+}
+
+.ampm-text {
+    color: #ffd700 !important;
+}
+
+/* Date: warm cream */
+.date-text {
+    color: #fffde7 !important;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.7) !important;
+}
+
+.date-highlight {
+    color: #ffd700 !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6), 0 0 10px rgba(255,215,0,0.3) !important;
+}
+
+/* Countdown: gold number */
+.countdown-text {
+    color: #fffde7 !important;
+    background: rgba(0,0,0,0.2) !important;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.7) !important;
+}
+
+.countdown-number {
+    color: #ffd700 !important;
+    text-shadow:
+        0 2px 4px rgba(0,0,0,0.6),
+        0 0 15px rgba(255,215,0,0.5),
+        0 0 30px rgba(255,215,0,0.25) !important;
+    animation: xmas-countdown-glow 3s ease-in-out infinite alternate !important;
+}
+
+@keyframes xmas-countdown-glow {
+    from {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.6), 0 0 15px rgba(255,215,0,0.5), 0 0 30px rgba(255,215,0,0.2);
+    }
+    to {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.6), 0 0 25px rgba(255,215,0,0.8), 0 0 50px rgba(255,215,0,0.4);
+    }
+}
+
+/* World clock cards: Christmas styling */
+.world-clock-display {
+    background: rgba(13,43,26,0.75) !important;
+    border: 1px solid rgba(255,215,0,0.35) !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,215,0,0.15) !important;
+    backdrop-filter: blur(8px);
+}
+
+.world-clock-display:hover {
+    background: rgba(13,43,26,0.88) !important;
+    border-color: rgba(255,215,0,0.6) !important;
+}
+
+.world-clock-city-name {
+    color: #e74c3c !important;
+    font-weight: 600 !important;
+}
+
+.world-clock-time {
+    color: #ffd700 !important;
+    text-shadow: 0 0 8px rgba(255,215,0,0.3) !important;
+}
+
+.world-clock-date {
+    color: rgba(255,253,231,0.7) !important;
+}
+
+/* Settings ornament button */
+.settings-toggle {
+    background: radial-gradient(circle at 35% 30%, #ff6b6b, #c0392b 60%, #7a0000) !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(192,57,43,0.6), inset 0 -3px 8px rgba(0,0,0,0.3) !important;
+    position: relative;
+    overflow: visible !important;
+}
+
+.settings-toggle::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(180deg, #888 0%, #ffd700 100%);
+    border-radius: 2px 2px 0 0;
+    z-index: 1;
+}
+
+.settings-toggle::after {
+    content: '';
+    position: absolute;
+    top: 9px;
+    left: 33%;
+    width: 11px;
+    height: 7px;
+    background: rgba(255,255,255,0.28);
+    border-radius: 50%;
+    transform: rotate(-30deg);
+}
+
+.settings-toggle .visually-hidden + * { display: none; }
+
+.settings-toggle:hover {
+    transform: scale(1.1) rotate(-8deg) !important;
+    background: radial-gradient(circle at 35% 30%, #ff8888, #c0392b 60%, #7a0000) !important;
+    box-shadow: 0 6px 20px rgba(192,57,43,0.8) !important;
+}
+
+.settings-toggle:active {
+    transform: scale(1.05) rotate(-4deg) !important;
+}

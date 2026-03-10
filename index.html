@@ -18,6 +18,15 @@
 </head>
 
 <body>
+
+<!-- Christmas: village (static, behind snow) -->
+<canvas id="village-canvas"></canvas>
+<!-- Christmas: falling snow -->
+<canvas id="snow-canvas"></canvas>
+<!-- Christmas: string lights -->
+<div class="light-wire"></div>
+<div class="lights-strand" id="lights-strand"></div>
+
     <main class="app-container">
         <div class="container-fluid h-100">
             <header class="app-header">
@@ -56,7 +65,6 @@
                         aria-expanded="false"
                         style="width: 3.5rem; height: 3.5rem; font-size: 1.25rem;">
                     <span class="visually-hidden">Toggle settings</span>
-                    ⚙️
                 </button>
                 <div class="dropdown-menu dropdown-menu-end p-0" 
                      style="width: 320px; background: rgba(0, 0, 0, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(20px);">
@@ -73,7 +81,6 @@
                     data-bs-target="#settingsOffcanvas"
                     style="width: 3.5rem; height: 3.5rem; font-size: 1.25rem;">
                 <span class="visually-hidden">Toggle settings</span>
-                ⚙️
             </button>
         </div>
                 <div class="card-body">
@@ -957,6 +964,221 @@
             console.error('Unhandled promise rejection:', event.reason);
             event.preventDefault();
         });
+
+        // ── Christmas: String Lights ──
+        (function () {
+            var strand = document.getElementById('lights-strand');
+            if (!strand) return;
+            var colors = ['red','green','gold','blue','white','red','green','gold','blue','white'];
+            for (var i = 0; i < 20; i++) {
+                var wrap = document.createElement('div');
+                wrap.className = 'bulb-wrap';
+                var wire = document.createElement('div');
+                wire.className = 'bulb-wire';
+                var bulb = document.createElement('div');
+                bulb.className = 'bulb ' + colors[i % colors.length];
+                wrap.appendChild(wire);
+                wrap.appendChild(bulb);
+                strand.appendChild(wrap);
+            }
+        })();
+
+        // ── Christmas: Snow ──
+        (function () {
+            var canvas = document.getElementById('snow-canvas');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            resize();
+            window.addEventListener('resize', resize);
+            var flakes = Array.from({ length: 80 }, function () { return {
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                r: 1.5 + Math.random() * 3,
+                speed: 0.4 + Math.random() * 0.8,
+                drift: (Math.random() - 0.5) * 0.4,
+                opacity: 0.3 + Math.random() * 0.5
+            }; });
+            function drawSnow() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                flakes.forEach(function (f) {
+                    ctx.beginPath();
+                    ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255,255,255,' + f.opacity + ')';
+                    ctx.fill();
+                    f.y += f.speed; f.x += f.drift;
+                    if (f.y > canvas.height + 10) { f.y = -10; f.x = Math.random() * canvas.width; }
+                    if (f.x > canvas.width + 10)  { f.x = -10; }
+                    if (f.x < -10)                { f.x = canvas.width + 10; }
+                });
+                requestAnimationFrame(drawSnow);
+            }
+            drawSnow();
+        })();
+
+        // ── Christmas: Village ──
+        (function () {
+            var vc = document.getElementById('village-canvas');
+            if (!vc) return;
+            var vctx = vc.getContext('2d');
+
+            function pineTree(ctx, cx, gy, w, h) {
+                var trunkH = h * 0.18;
+                ctx.fillStyle = '#2d1200';
+                ctx.fillRect(cx - 4, gy - trunkH, 8, trunkH);
+                var tiers = [
+                    { base: 0, peak: 0.42, wf: 1.0, snow: 0.55 },
+                    { base: 0.30, peak: 0.68, wf: 0.70, snow: 0.45 },
+                    { base: 0.58, peak: 0.88, wf: 0.44, snow: 0.32 }
+                ];
+                tiers.forEach(function (t, i) {
+                    var by = gy - trunkH - (h - trunkH) * t.base;
+                    var py = gy - trunkH - (h - trunkH) * t.peak;
+                    var hw = (w / 2) * t.wf;
+                    ctx.beginPath();
+                    ctx.moveTo(cx - hw, by); ctx.lineTo(cx + hw, by); ctx.lineTo(cx, py);
+                    ctx.closePath();
+                    ctx.fillStyle = 'hsl(135,52%,' + (8 + i * 2) + '%)';
+                    ctx.fill();
+                    var shw = hw * t.snow;
+                    ctx.beginPath();
+                    ctx.moveTo(cx - shw, by); ctx.lineTo(cx + shw, by); ctx.lineTo(cx, py - 3);
+                    ctx.closePath();
+                    ctx.fillStyle = 'rgba(235,250,240,0.78)';
+                    ctx.fill();
+                });
+            }
+
+            function farTree(ctx, cx, gy, w, h) {
+                var trunkH = h * 0.18;
+                ctx.fillStyle = 'rgba(20,50,25,0.45)';
+                ctx.fillRect(cx - 3, gy - trunkH, 6, trunkH);
+                [[1.0, 0, 0.4], [0.68, 0.32, 0.38], [0.42, 0.60, 0.34]].forEach(function (t) {
+                    var by = gy - trunkH - (h - trunkH) * t[1];
+                    var py = by - (h - trunkH) * t[2];
+                    var hw = (w / 2) * t[0];
+                    ctx.beginPath();
+                    ctx.moveTo(cx - hw, by); ctx.lineTo(cx + hw, by); ctx.lineTo(cx, py);
+                    ctx.closePath();
+                    ctx.fillStyle = 'rgba(18,48,22,0.42)';
+                    ctx.fill();
+                });
+            }
+
+            function house(ctx, x, gy, w, h, roofH, chimney, wins) {
+                var top = gy - h, cx = x + w / 2, peak = top - roofH;
+                ctx.fillStyle = '#091a0d'; ctx.fillRect(x, top, w, h);
+                ctx.beginPath();
+                ctx.moveTo(x - 6, top); ctx.lineTo(x + w + 6, top); ctx.lineTo(cx, peak);
+                ctx.closePath(); ctx.fillStyle = '#050e08'; ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(x - 6, top); ctx.lineTo(x + w + 6, top); ctx.lineTo(cx, peak - 5);
+                ctx.closePath(); ctx.fillStyle = 'rgba(232,248,238,0.82)'; ctx.fill();
+                if (chimney) {
+                    var chX = x + w * 0.72, chW = Math.max(8, w * 0.1);
+                    var slopeY = top + roofH * ((chX - (x + w + 6)) / (cx - (x + w + 6)));
+                    var chH = roofH * 0.65;
+                    ctx.fillStyle = '#0a1208'; ctx.fillRect(chX, slopeY - chH, chW, chH + 2);
+                    ctx.fillStyle = 'rgba(232,248,238,0.85)'; ctx.fillRect(chX - 2, slopeY - chH, chW + 4, 4);
+                    [0, 1, 2].forEach(function (i) {
+                        ctx.beginPath(); ctx.arc(chX + chW / 2 + i * 3, slopeY - chH - 10 - i * 10, 5 + i * 2, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(200,210,205,' + (0.10 - i * 0.025) + ')'; ctx.fill();
+                    });
+                }
+                var winW = Math.max(9, w * 0.17), winH = winW * 1.35, winY = top + h * 0.18, step = w / (wins + 1);
+                for (var i = 0; i < wins; i++) {
+                    var wx = x + step * (i + 1) - winW / 2;
+                    ctx.shadowColor = 'rgba(255,195,70,0.6)'; ctx.shadowBlur = 14;
+                    ctx.fillStyle = '#ffc85a'; ctx.fillRect(wx, winY, winW, winH);
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+                    ctx.fillRect(wx + winW / 2 - 1, winY, 2, winH);
+                    ctx.fillRect(wx, winY + winH / 2 - 1, winW, 2);
+                }
+                var dw = Math.max(10, w * 0.18), dh = Math.min(h * 0.38, 32), dx = cx - dw / 2;
+                ctx.fillStyle = '#140b02'; ctx.fillRect(dx, gy - dh, dw, dh);
+                ctx.beginPath(); ctx.arc(dx + dw / 2, gy - dh, dw / 2, Math.PI, 0);
+                ctx.fillStyle = '#140b02'; ctx.fill();
+                ctx.fillStyle = '#ffd700'; ctx.shadowColor = 'rgba(255,215,0,0.5)'; ctx.shadowBlur = 3;
+                ctx.beginPath(); ctx.arc(dx + dw * 0.72, gy - dh * 0.45, 2, 0, Math.PI * 2); ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            function church(ctx, x, gy, s) {
+                var w = 90 * s, h = 100 * s, roofH = 36 * s;
+                var cx = x + w / 2, top = gy - h, peak = top - roofH;
+                ctx.fillStyle = '#091a0d'; ctx.fillRect(x, top, w, h);
+                ctx.beginPath(); ctx.moveTo(x - 6*s, top); ctx.lineTo(x + w + 6*s, top); ctx.lineTo(cx, peak);
+                ctx.closePath(); ctx.fillStyle = '#050e08'; ctx.fill();
+                ctx.beginPath(); ctx.moveTo(x - 6*s, top); ctx.lineTo(x + w + 6*s, top); ctx.lineTo(cx, peak - 5*s);
+                ctx.closePath(); ctx.fillStyle = 'rgba(232,248,238,0.82)'; ctx.fill();
+                var stW = 22*s, stX = cx - stW/2, stH = 52*s, stBase = peak;
+                ctx.fillStyle = '#091a0d'; ctx.fillRect(stX, stBase - stH, stW, stH);
+                var spH = 48*s;
+                ctx.beginPath(); ctx.moveTo(stX - 5*s, stBase - stH); ctx.lineTo(stX + stW + 5*s, stBase - stH); ctx.lineTo(cx, stBase - stH - spH);
+                ctx.closePath(); ctx.fillStyle = '#050e08'; ctx.fill();
+                ctx.beginPath(); ctx.moveTo(stX - 5*s, stBase - stH); ctx.lineTo(stX + stW + 5*s, stBase - stH); ctx.lineTo(cx, stBase - stH - spH - 4*s);
+                ctx.closePath(); ctx.fillStyle = 'rgba(232,248,238,0.85)'; ctx.fill();
+                var crossTip = stBase - stH - spH;
+                ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2.5*s;
+                ctx.shadowColor = 'rgba(255,215,0,0.7)'; ctx.shadowBlur = 8;
+                ctx.beginPath(); ctx.moveTo(cx, crossTip + 5*s); ctx.lineTo(cx, crossTip + 20*s); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx - 7*s, crossTip + 10*s); ctx.lineTo(cx + 7*s, crossTip + 10*s); ctx.stroke();
+                ctx.shadowBlur = 0; ctx.lineWidth = 1;
+                var bwW = 12*s, bwY = stBase - stH + 10*s;
+                ctx.shadowColor = 'rgba(255,195,70,0.45)'; ctx.shadowBlur = 8;
+                ctx.fillStyle = 'rgba(255,195,70,0.72)';
+                ctx.fillRect(cx - bwW/2, bwY, bwW, 16*s);
+                ctx.beginPath(); ctx.arc(cx, bwY, bwW/2, Math.PI, 0); ctx.fill();
+                ctx.shadowBlur = 0;
+                [[x + 12*s, top + 12*s], [x + w - 12*s - 14*s, top + 12*s]].forEach(function (pair) {
+                    var wx = pair[0], wy = pair[1], ww = 14*s, arc = ww/2;
+                    ctx.shadowColor = 'rgba(255,195,70,0.55)'; ctx.shadowBlur = 10;
+                    ctx.fillStyle = '#ffc85a'; ctx.fillRect(wx, wy + arc, ww, 20*s);
+                    ctx.beginPath(); ctx.arc(wx + arc, wy + arc, arc, Math.PI, 0); ctx.fill();
+                });
+                ctx.shadowBlur = 0;
+                var dw = 20*s, dh = 32*s, dx = cx - dw/2;
+                ctx.fillStyle = '#140b02'; ctx.fillRect(dx, gy - dh, dw, dh);
+                ctx.beginPath(); ctx.arc(dx + dw/2, gy - dh, dw/2, Math.PI, 0); ctx.fill();
+                ctx.fillStyle = '#ffd700'; ctx.shadowColor = 'rgba(255,215,0,0.5)'; ctx.shadowBlur = 3;
+                ctx.beginPath(); ctx.arc(dx + dw*0.72, gy - dh*0.45, 2, 0, Math.PI*2); ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            function drawVillage() {
+                vc.width = window.innerWidth; vc.height = window.innerHeight;
+                var W = vc.width, H = vc.height, s = W / 1440, gy = H;
+                var gr = vctx.createLinearGradient(0, H - 35*s, 0, H);
+                gr.addColorStop(0, 'rgba(210,240,225,0.0)');
+                gr.addColorStop(1, 'rgba(235,252,242,0.55)');
+                vctx.fillStyle = gr; vctx.fillRect(0, H - 35*s, W, 35*s);
+                [[180,32,48],[380,26,40],[560,30,46],[800,28,43],[1050,31,47],[1260,27,41],[1400,29,44]].forEach(function (t) {
+                    farTree(vctx, t[0]*s, gy - 32*s, t[1]*s, t[2]*s);
+                });
+                pineTree(vctx, 42*s, gy, 62*s, 82*s);
+                pineTree(vctx, 88*s, gy, 78*s, 108*s);
+                pineTree(vctx, 132*s, gy, 54*s, 72*s);
+                house(vctx, 168*s, gy, 68*s, 65*s, 38*s, false, 2);
+                pineTree(vctx, 278*s, gy, 72*s, 96*s);
+                house(vctx, 316*s, gy, 88*s, 82*s, 44*s, true, 2);
+                church(vctx, 438*s, gy, s);
+                pineTree(vctx, 618*s, gy, 68*s, 92*s);
+                house(vctx, 665*s, gy, 105*s, 92*s, 50*s, true, 3);
+                pineTree(vctx, 818*s, gy, 74*s, 100*s);
+                pineTree(vctx, 868*s, gy, 58*s, 78*s);
+                house(vctx, 915*s, gy, 74*s, 70*s, 40*s, false, 2);
+                house(vctx, 1035*s, gy, 62*s, 105*s, 55*s, true, 1);
+                pineTree(vctx, 1148*s, gy, 70*s, 95*s);
+                pineTree(vctx, 1200*s, gy, 84*s, 112*s);
+                pineTree(vctx, 1252*s, gy, 56*s, 76*s);
+                house(vctx, 1305*s, gy, 70*s, 66*s, 38*s, false, 2);
+                pineTree(vctx, 1408*s, gy, 74*s, 98*s);
+            }
+
+            drawVillage();
+            window.addEventListener('resize', drawVillage);
+        })();
     </script>
 
     <!-- Bootstrap JavaScript -->
