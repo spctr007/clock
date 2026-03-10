@@ -4,17 +4,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Local time display webapp with NTP synchronization and customizable backgrounds">
+    <meta name="description" content="Christmas clock with NTP synchronization">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="author" content="Time Display Webapp">
-    <meta name="theme-color" content="#000000">
-    <title>Time Display</title>
-    <!-- Bootstrap CSS -->
+    <meta name="theme-color" content="#0d2b1a">
+    <title>Christmas Clock</title>
+
+    <!-- Bootstrap CSS (for settings dropdown/offcanvas) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <!-- Custom CSS (loaded after Bootstrap to override) -->
-    <link rel="stylesheet" href="styles/main.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ── Reset ── */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ── Variables ── */
+        :root {
+            --green-deep:  #0d2b1a;
+            --green-mid:   #1a472a;
+            --green-light: #2d5a27;
+            --gold:        #ffd700;
+            --gold-dim:    #b8960c;
+            --red:         #c0392b;
+            --red-bright:  #e74c3c;
+            --cream:       #fffde7;
+        }
+
+        /* ── Base ── */
+        html, body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(180deg, var(--green-deep) 0%, var(--green-mid) 55%, var(--green-light) 100%);
+            height: 100vh;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* ── Canvas layers ── */
+        #village-canvas {
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 0;
+        }
+        #snow-canvas {
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 1;
+        }
+
+        /* ── Background overlay (user upload) ── */
+        .background-overlay {
+            position: fixed; inset: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.5;
+            z-index: 2;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        /* ── String lights ── */
+        .light-wire {
+            position: fixed; top: 0; left: 0; width: 100%; height: 18px;
+            border-bottom: 2px solid #2a2a2a;
+            z-index: 9; pointer-events: none;
+        }
+        .lights-strand {
+            position: fixed; top: 0; left: 0; width: 100%;
+            display: flex; justify-content: space-around; align-items: flex-start;
+            z-index: 10; padding: 0 1rem; pointer-events: none;
+        }
+        .bulb-wrap { display: flex; flex-direction: column; align-items: center; }
+        .bulb-wire { width: 1px; height: 14px; background: #2a2a2a; }
+        .bulb {
+            width: 13px; height: 18px;
+            border-radius: 50% 50% 45% 45%;
+            position: relative;
+            animation: xmas-twinkle 1.5s ease-in-out infinite;
+        }
+        .bulb::before {
+            content: '';
+            position: absolute; top: -5px; left: 3px;
+            width: 7px; height: 6px;
+            background: #555; border-radius: 2px 2px 0 0;
+        }
+        .bulb.red   { background: #e74c3c; box-shadow: 0 0 8px 3px rgba(231,76,60,0.7); }
+        .bulb.green { background: #27ae60; box-shadow: 0 0 8px 3px rgba(39,174,96,0.7); }
+        .bulb.gold  { background: var(--gold); box-shadow: 0 0 8px 3px rgba(255,215,0,0.7); }
+        .bulb.blue  { background: #2980b9; box-shadow: 0 0 8px 3px rgba(41,128,185,0.7); }
+        .bulb.white { background: #f0f0ff; box-shadow: 0 0 8px 3px rgba(220,220,255,0.7); }
+
+        @keyframes xmas-twinkle {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.25; }
+        }
+        .bulb-wrap:nth-child(1)  .bulb { animation-delay: 0.00s; }
+        .bulb-wrap:nth-child(2)  .bulb { animation-delay: 0.15s; }
+        .bulb-wrap:nth-child(3)  .bulb { animation-delay: 0.30s; }
+        .bulb-wrap:nth-child(4)  .bulb { animation-delay: 0.45s; }
+        .bulb-wrap:nth-child(5)  .bulb { animation-delay: 0.60s; }
+        .bulb-wrap:nth-child(6)  .bulb { animation-delay: 0.75s; }
+        .bulb-wrap:nth-child(7)  .bulb { animation-delay: 0.90s; }
+        .bulb-wrap:nth-child(8)  .bulb { animation-delay: 1.05s; }
+        .bulb-wrap:nth-child(9)  .bulb { animation-delay: 1.20s; }
+        .bulb-wrap:nth-child(10) .bulb { animation-delay: 1.35s; }
+        .bulb-wrap:nth-child(11) .bulb { animation-delay: 0.20s; }
+        .bulb-wrap:nth-child(12) .bulb { animation-delay: 0.35s; }
+        .bulb-wrap:nth-child(13) .bulb { animation-delay: 0.50s; }
+        .bulb-wrap:nth-child(14) .bulb { animation-delay: 0.65s; }
+        .bulb-wrap:nth-child(15) .bulb { animation-delay: 0.80s; }
+        .bulb-wrap:nth-child(16) .bulb { animation-delay: 0.95s; }
+        .bulb-wrap:nth-child(17) .bulb { animation-delay: 1.10s; }
+        .bulb-wrap:nth-child(18) .bulb { animation-delay: 1.25s; }
+        .bulb-wrap:nth-child(19) .bulb { animation-delay: 1.40s; }
+        .bulb-wrap:nth-child(20) .bulb { animation-delay: 0.05s; }
+
+        /* ── Settings ornament button ── */
+        .settings-panel {
+            position: fixed; top: 2.5rem; right: 2rem; z-index: 20;
+        }
+        .settings-toggle {
+            width: 52px; height: 52px;
+            border: none !important; outline: none !important;
+            border-radius: 50% !important;
+            background: radial-gradient(circle at 35% 30%, #ff6b6b, var(--red) 60%, #7a0000) !important;
+            box-shadow: 0 4px 15px rgba(192,57,43,0.6), inset 0 -3px 8px rgba(0,0,0,0.3) !important;
+            position: relative; overflow: visible !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+            cursor: pointer;
+            padding: 0 !important;
+        }
+        .settings-toggle::before {
+            content: '';
+            position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+            width: 8px; height: 8px;
+            background: linear-gradient(180deg, #888 0%, var(--gold) 100%);
+            border-radius: 2px 2px 0 0;
+        }
+        .settings-toggle::after {
+            content: '';
+            position: absolute; top: 9px; left: 33%;
+            width: 11px; height: 7px;
+            background: rgba(255,255,255,0.28); border-radius: 50%;
+            transform: rotate(-30deg);
+        }
+        .settings-toggle:hover {
+            transform: scale(1.1) rotate(-8deg) !important;
+            box-shadow: 0 6px 20px rgba(192,57,43,0.8) !important;
+        }
+
+        /* ── Settings dropdown menu ── */
+        .settings-menu {
+            width: 300px;
+            background: rgba(10, 30, 15, 0.96) !important;
+            border: 1px solid rgba(255,215,0,0.25) !important;
+            backdrop-filter: blur(20px);
+            border-radius: 12px !important;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5) !important;
+        }
+        .settings-menu .form-check-label { color: var(--cream); }
+        .settings-menu .form-label       { color: var(--cream); }
+        .settings-menu h6                { color: var(--gold); letter-spacing: 0.05em; }
+        .settings-menu .section-divider  { border-color: rgba(255,215,0,0.15); }
+
+        /* ── Main layout ── */
+        .app-layout {
+            position: relative; z-index: 3;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            min-height: 100vh; gap: 1rem;
+            padding-top: 44px; padding-bottom: 80px;
+        }
+
+        /* ── Countdown ── */
+        .christmas-countdown { text-align: center; animation: fadeInDown 0.8s ease; }
+        .countdown-text {
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            font-weight: 400; color: var(--gold);
+            letter-spacing: 0.15em; text-transform: uppercase;
+            text-shadow: 0 0 12px rgba(255,215,0,0.5);
+        }
+        .countdown-number {
+            font-size: 1.9em; font-weight: 600; color: var(--gold);
+            text-shadow: 0 0 16px rgba(255,215,0,0.7);
+            vertical-align: middle; line-height: 1;
+            animation: xmas-glow 3s ease-in-out infinite alternate;
+        }
+        @keyframes xmas-glow {
+            from { text-shadow: 0 0 16px rgba(255,215,0,0.5); }
+            to   { text-shadow: 0 0 28px rgba(255,215,0,0.9), 0 0 50px rgba(255,215,0,0.4); }
+        }
+        .countdown-text.christmas-day { color: var(--red-bright); animation: none; }
+
+        /* ── Time display ── */
+        .time-display-section { text-align: center; animation: fadeInUp 0.8s ease 0.2s both; }
+        .time-display         { line-height: 1; }
+        .time-text {
+            font-size: clamp(5rem, 20vw, 14rem);
+            font-weight: 300; letter-spacing: -0.02em; color: var(--gold);
+            text-shadow: 0 0 30px rgba(255,215,0,0.35), 0 0 60px rgba(255,215,0,0.15), 0 2px 4px rgba(0,0,0,0.5);
+            font-variant-numeric: tabular-nums;
+        }
+        .ampm-text {
+            font-size: 0.38em; font-weight: 300; color: var(--gold);
+            opacity: 0.75; vertical-align: super; margin-left: 0.1em;
+        }
+        .date-display { margin-top: 0.5rem; }
+        .date-text {
+            font-size: clamp(0.8rem, 2vw, 1.1rem);
+            font-weight: 400; letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--cream); opacity: 0.85;
+        }
+        .date-highlight {
+            color: var(--gold);
+            text-shadow: 0 0 8px rgba(255,215,0,0.3);
+        }
+
+        /* ── Connection status ── */
+        .connection-status {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding: 0.35rem 0.9rem;
+            background: rgba(0,0,0,0.25); border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .status-indicator {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #fbbf24; animation: pulse 2s ease-in-out infinite;
+        }
+        .status-indicator.connected    { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.7); animation: none; }
+        .status-indicator.disconnected { background: #ef4444; }
+        .status-indicator.reconnecting { background: #3b82f6; animation: pulse 1s infinite; }
+        .status-text {
+            font-size: 0.7rem; letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.5); text-transform: uppercase;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.6; transform: scale(0.85); }
+        }
+
+        /* ── World clocks ── */
+        .world-clocks-section { animation: fadeInUp 0.8s ease 0.4s both; }
+        .world-clocks-container {
+            display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+        }
+        .world-clock-display {
+            background: rgba(13,43,26,0.78);
+            border: 1px solid rgba(255,215,0,0.35);
+            border-radius: 12px; padding: 0.75rem 1.25rem;
+            text-align: center; min-width: 120px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,215,0,0.12);
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .world-clock-display:hover { border-color: rgba(255,215,0,0.6); transform: translateY(-2px); }
+        .world-clock-city-name {
+            font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--red-bright); font-weight: 600; margin-bottom: 0.25rem;
+        }
+        .world-clock-time {
+            font-size: 1.4rem; font-weight: 300; color: var(--gold);
+            text-shadow: 0 0 8px rgba(255,215,0,0.3);
+        }
+        .world-clock-date {
+            font-size: 0.6rem; color: rgba(255,255,255,0.4);
+            letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.15rem;
+        }
+
+        /* ── Error toast ── */
+        .error-toast {
+            position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
+            background: rgba(220,38,38,0.95); color: #fff;
+            padding: 0.75rem 1.25rem; border-radius: 8px;
+            display: flex; align-items: center; gap: 0.75rem;
+            z-index: 100; max-width: 90vw;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            font-size: 0.875rem;
+        }
+        [hidden] { display: none !important; }
+
+        /* ── Animations ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Mobile ── */
+        @media (max-width: 576px) {
+            .settings-panel { top: 1.25rem; right: 1rem; }
+            .app-layout { gap: 0.75rem; padding-bottom: 60px; }
+            .time-text { font-size: clamp(4rem, 18vw, 8rem); }
+            .world-clocks-container { gap: 0.5rem; }
+            .world-clock-display { min-width: 100px; padding: 0.6rem 0.9rem; }
+        }
+    </style>
 </head>
 
 <body>
@@ -27,1162 +316,686 @@
 <div class="light-wire"></div>
 <div class="lights-strand" id="lights-strand"></div>
 
-    <main class="app-container">
-        <div class="container-fluid h-100">
-            <header class="app-header">
-                <h1 class="visually-hidden">Time Display Application</h1>
-            </header>
+<!-- Background overlay (user image upload) -->
+<div class="background-overlay" id="backgroundOverlay"></div>
 
-            <div class="row h-100 justify-content-center align-items-center">
-                <div class="col-12 col-lg-10 col-xl-8">
-                    <section class="christmas-countdown text-center mb-4" id="christmasCountdown">
-                        <span class="countdown-text" id="countdownText">🎄 Loading...</span>
-                    </section>
-
-                    <section class="time-display-section text-center" aria-live="polite" aria-label="Current time display">
-                        <div class="time-display text-center mb-4" id="timeDisplay">
-                            <span class="time-text" id="timeText">--:--</span>
-                        </div>
-                        <div class="date-display mb-4" id="dateDisplay">
-                            <span class="date-text" id="dateText">Loading date...</span>
-                        </div>
-                        <div class="connection-status d-flex justify-content-center align-items-center" id="connectionStatus" aria-live="polite">
-                            <span class="status-indicator me-2" id="statusIndicator"></span>
-                            <span class="status-text" id="statusText">Loading...</span>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </div>
-
-        <!-- Settings Panel - Bootstrap Only -->
-        <div class="settings-panel position-fixed" style="top: 2rem; right: 2rem; z-index: 1060;">
-            <!-- Desktop Dropdown Button -->
-            <div class="dropdown d-none d-md-block">
-                <button class="settings-toggle btn btn-outline-light rounded-circle" 
-                        type="button" 
-                        data-bs-toggle="dropdown" 
-                        aria-expanded="false"
-                        style="width: 3.5rem; height: 3.5rem; font-size: 1.25rem;">
-                    <span class="visually-hidden">Toggle settings</span>
-                </button>
-                <div class="dropdown-menu dropdown-menu-end p-0" 
-                     style="width: 320px; background: rgba(0, 0, 0, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(20px);">
-                    <div class="p-3" id="desktopSettingsContent">
-                        <!-- Desktop settings content will be populated here -->
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Mobile Offcanvas Button -->
-            <button class="settings-toggle btn btn-outline-light rounded-circle d-md-none" 
-                    type="button"
-                    data-bs-toggle="offcanvas" 
-                    data-bs-target="#settingsOffcanvas"
-                    style="width: 3.5rem; height: 3.5rem; font-size: 1.25rem;">
-                <span class="visually-hidden">Toggle settings</span>
-            </button>
-        </div>
-                <div class="card-body">
-                    <div class="settings-group mb-4">
-                        <h5 class="settings-title card-title text-light mb-3">Display Settings</h5>
-
-                        <div class="form-check mb-3">
-                            <input type="checkbox" id="showSeconds" class="form-check-input">
-                            <label class="form-check-label text-light" for="showSeconds">
-                                Show seconds
-                            </label>
-                        </div>
-
-                        <div class="form-check mb-3">
-                            <input type="checkbox" id="use24Hour" class="form-check-input">
-                            <label class="form-check-label text-light" for="use24Hour">
-                                24-hour format
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="settings-group mb-4">
-                        <h5 class="settings-title card-title text-light mb-3">World Clocks</h5>
-
-                        <div class="form-check mb-3">
-                            <input type="checkbox" id="showWorldClocks" class="form-check-input">
-                            <label class="form-check-label text-light" for="showWorldClocks">
-                                Show world clocks
-                            </label>
-                        </div>
-
-                        <div class="world-clock-settings" id="worldClockSettings">
-                            <div class="world-clock-list mb-3" id="worldClockList">
-                                <!-- World clock items will be dynamically added here -->
-                            </div>
-
-                            <div class="add-world-clock" id="addWorldClockSection">
-                                <select id="timezoneSelect" class="form-select form-select-sm bg-dark text-light border-secondary mb-2">
-                                    <option value="">Select a timezone...</option>
-                                    <option value="America/New_York">New York (EST/EDT)</option>
-                                    <option value="America/Los_Angeles">Los Angeles (PST/PDT)</option>
-                                    <option value="America/Chicago">Chicago (CST/CDT)</option>
-                                    <option value="America/Denver">Denver (MST/MDT)</option>
-                                    <option value="Europe/London">London (GMT/BST)</option>
-                                    <option value="Europe/Paris">Paris (CET/CEST)</option>
-                                    <option value="Europe/Monaco">Monaco (CET/CEST)</option>
-                                    <option value="Europe/Berlin">Berlin (CET/CEST)</option>
-                                    <option value="Europe/Rome">Rome (CET/CEST)</option>
-                                    <option value="Europe/Madrid">Madrid (CET/CEST)</option>
-                                    <option value="Asia/Tokyo">Tokyo (JST)</option>
-                                    <option value="Asia/Shanghai">Shanghai (CST)</option>
-                                    <option value="Asia/Hong_Kong">Hong Kong (HKT)</option>
-                                    <option value="Asia/Singapore">Singapore (SGT)</option>
-                                    <option value="Asia/Dubai">Dubai (GST)</option>
-                                    <option value="Asia/Kolkata">Mumbai (IST)</option>
-                                    <option value="Australia/Sydney">Sydney (AEST/AEDT)</option>
-                                    <option value="Australia/Melbourne">Melbourne (AEST/AEDT)</option>
-                                    <option value="Pacific/Auckland">Auckland (NZST/NZDT)</option>
-                                    <option value="America/Sao_Paulo">São Paulo (BRT/BRST)</option>
-                                    <option value="America/Mexico_City">Mexico City (CST/CDT)</option>
-                                </select>
-                                <button id="addWorldClockBtn" class="btn btn-outline-primary btn-sm w-100" disabled>
-                                    Add World Clock
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="settings-group">
-                        <h5 class="settings-title card-title text-light mb-3">Background</h5>
-
-                        <div class="mb-3">
-                            <label for="backgroundUpload" class="form-label text-light">
-                                Upload Background
-                            </label>
-                            <input type="file" id="backgroundUpload" class="form-control form-control-sm bg-dark text-light border-secondary" accept="image/*">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="opacitySlider" class="form-label text-light">
-                                Background Opacity: <span class="opacity-value" id="opacityValue">50%</span>
-                            </label>
-                            <input type="range" id="opacitySlider" class="form-range" min="0" max="100" value="50"
-                                aria-valuemin="0" aria-valuemax="100">
-                        </div>
-
-                        <button class="btn btn-outline-danger btn-sm w-100" id="resetBackground">
-                            Reset to Default
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <div class="background-overlay" id="backgroundOverlay"></div>
-        
-        <section class="world-clocks-section container-fluid mt-4" id="worldClocksSection" aria-label="World clocks" hidden>
-            <div class="row justify-content-center">
-                <div class="col-12 col-lg-10">
-                    <div class="world-clocks-container row g-3" id="worldClocksContainer">
-                        <!-- World clock displays will be dynamically added here -->
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Mobile Settings Offcanvas -->
-    <div class="offcanvas offcanvas-end d-md-none" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
-        <div class="offcanvas-header bg-dark border-bottom border-secondary">
-            <h5 class="offcanvas-title text-light" id="settingsOffcanvasLabel">Settings</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body bg-dark" id="mobileSettingsContent">
-            <!-- Mobile settings content will be populated by JavaScript -->
+<!-- ── Settings Panel ── -->
+<div class="settings-panel">
+    <!-- Desktop: Bootstrap dropdown -->
+    <div class="dropdown d-none d-md-block">
+        <button class="settings-toggle dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Toggle settings">
+            <span class="visually-hidden">Settings</span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end settings-menu p-3" id="desktopSettingsContent">
+            <!-- populated by JS -->
         </div>
     </div>
+    <!-- Mobile: Bootstrap offcanvas -->
+    <button class="settings-toggle d-md-none"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#settingsOffcanvas"
+            aria-label="Toggle settings">
+        <span class="visually-hidden">Settings</span>
+    </button>
+</div>
 
-    <!-- Error Toast -->
-    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3">
-        <div class="toast align-items-center text-bg-danger border-0" id="errorMessage" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body" id="errorText">
-                    Error message will appear here
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" id="errorClose" aria-label="Close"></button>
+<!-- ── Main content ── -->
+<main class="app-layout">
+
+    <section class="christmas-countdown" id="christmasCountdown" aria-live="polite">
+        <span class="countdown-text" id="countdownText">🎄 Loading...</span>
+    </section>
+
+    <section class="time-display-section" aria-live="polite" aria-label="Current time">
+        <div class="time-display">
+            <span class="time-text" id="timeText">--:--</span>
+        </div>
+        <div class="date-display">
+            <span class="date-text" id="dateText">Loading date...</span>
+        </div>
+        <div class="connection-status" id="connectionStatus">
+            <span class="status-indicator" id="statusIndicator"></span>
+            <span class="status-text" id="statusText">Loading...</span>
+        </div>
+    </section>
+
+    <section class="world-clocks-section" id="worldClocksSection" aria-label="World clocks" hidden>
+        <div class="world-clocks-container" id="worldClocksContainer"></div>
+    </section>
+
+</main>
+
+<!-- ── Mobile Offcanvas ── -->
+<div class="offcanvas offcanvas-end d-md-none" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
+    <div class="offcanvas-header" style="background: rgba(10,30,15,0.98); border-bottom: 1px solid rgba(255,215,0,0.2);">
+        <h5 class="offcanvas-title" id="settingsOffcanvasLabel" style="color: var(--gold); letter-spacing: 0.05em;">Settings</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body" id="mobileSettingsContent" style="background: rgba(10,30,15,0.98);">
+        <!-- populated by JS -->
+    </div>
+</div>
+
+<!-- ── Error Toast ── -->
+<div class="error-toast" id="errorMessage" role="alert" aria-live="assertive" hidden>
+    <span id="errorText">Error</span>
+    <button type="button" class="btn-close btn-close-white ms-auto" id="errorClose" aria-label="Close"></button>
+</div>
+
+<!-- Mobile fallback for older browsers -->
+<script nomodule src="js/mobile-fallback.js"></script>
+
+<script>
+    'use strict';
+
+    // ── Application state ──
+    var showSeconds      = true;
+    var use24Hour        = false;
+    var showWorldClocks  = false;
+    var worldClocks      = [];
+    var updateInterval   = null;
+    var backgroundOpacity = 0.5;
+
+    // ── Bootstrap compatibility check ──
+    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    var supportsModules = 'noModule' in HTMLScriptElement.prototype;
+    if (isMobile && !supportsModules) {
+        var fb = document.createElement('script');
+        fb.src = 'js/mobile-fallback.js';
+        document.head.appendChild(fb);
+    }
+
+    // ── Init ──
+    document.addEventListener('DOMContentLoaded', function () {
+        loadSettings();
+        startTimeDisplay();
+        setupSettings();
+        setupErrorHandling();
+    });
+
+    // ── Settings persistence ──
+    function loadSettings() {
+        try {
+            var saved = localStorage.getItem('timeDisplaySettings');
+            if (saved) {
+                var s = JSON.parse(saved);
+                showSeconds     = s.showSeconds     !== undefined ? s.showSeconds     : true;
+                use24Hour       = s.use24Hour        !== undefined ? s.use24Hour       : false;
+                showWorldClocks = s.showWorldClocks  !== undefined ? s.showWorldClocks : false;
+                worldClocks     = s.worldClocks      || [];
+                backgroundOpacity = s.backgroundOpacity !== undefined ? s.backgroundOpacity : 0.5;
+            }
+        } catch (e) { console.warn('Failed to load settings:', e); }
+        applySavedBackground();
+    }
+
+    function saveSettings() {
+        try {
+            localStorage.setItem('timeDisplaySettings', JSON.stringify({
+                showSeconds:     showSeconds,
+                use24Hour:       use24Hour,
+                showWorldClocks: showWorldClocks,
+                worldClocks:     worldClocks,
+                backgroundOpacity: backgroundOpacity
+            }));
+        } catch (e) { console.warn('Failed to save settings:', e); }
+    }
+
+    // ── Clock ──
+    function startTimeDisplay() {
+        var timeEl   = document.getElementById('timeText');
+        var dateEl   = document.getElementById('dateText');
+        var statusEl = document.getElementById('statusText');
+        var indEl    = document.getElementById('statusIndicator');
+
+        if (!timeEl || !dateEl) return;
+
+        function updateTime() {
+            var now = new Date();
+            var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+            var ampm = '';
+
+            if (!use24Hour) {
+                ampm = h >= 12 ? 'PM' : 'AM';
+                h = h % 12 || 12;
+            }
+
+            var hh = String(h).padStart(2, '0');
+            var mm = String(m).padStart(2, '0');
+            var ss = String(s).padStart(2, '0');
+
+            var timeStr = hh + ':' + mm;
+            if (showSeconds) timeStr += ':' + ss;
+            if (!use24Hour && ampm) timeStr += '&nbsp;<span class="ampm-text">' + ampm + '</span>';
+            timeEl.innerHTML = timeStr;
+
+            var days  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+            var dateStr = days[now.getDay()] + ', <span class="date-highlight">'
+                + now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                + '</span>, week ' + getWeekNumber(now);
+            dateEl.innerHTML = dateStr;
+
+            updateChristmasCountdown();
+            if (showWorldClocks && worldClocks.length > 0) updateWorldClockTimes();
+        }
+
+        updateTime();
+        if (updateInterval) clearInterval(updateInterval);
+        updateInterval = setInterval(updateTime, 1000);
+
+        if (statusEl) statusEl.textContent = 'Local time';
+        if (indEl)    indEl.className = 'status-indicator disconnected';
+    }
+
+    function getWeekNumber(date) {
+        var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        var day = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - day);
+        var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    }
+
+    // ── Countdown ──
+    function updateChristmasCountdown() {
+        var el = document.getElementById('countdownText');
+        if (!el) return;
+        var now = new Date();
+        var xmas = new Date(now.getFullYear(), 11, 25);
+        if (now > xmas) xmas = new Date(now.getFullYear() + 1, 11, 25);
+        var days = Math.ceil((xmas - now) / 86400000);
+
+        if (days === 0) {
+            el.innerHTML = '🎄 Merry Christmas! 🎅';
+            el.classList.add('christmas-day');
+        } else if (days === 1) {
+            el.innerHTML = '🎄 Christmas is tomorrow! 🎁';
+            el.classList.remove('christmas-day');
+        } else {
+            el.innerHTML = '🎄 <span class="countdown-number">' + days + '</span> day' + (days === 1 ? '' : 's') + ' until Christmas';
+            el.classList.remove('christmas-day');
+        }
+    }
+
+    // ── Settings panel ──
+    var settingsHTML = `
+        <div class="mb-3 pb-3" style="border-bottom: 1px solid rgba(255,215,0,0.15);">
+            <h6 class="mb-3" style="color: #ffd700; letter-spacing: 0.05em; font-size: 0.75rem; text-transform: uppercase;">Display</h6>
+            <div class="form-check mb-2">
+                <input type="checkbox" id="showSeconds" class="form-check-input">
+                <label class="form-check-label" for="showSeconds" style="color: #fffde7;">Show seconds</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" id="use24Hour" class="form-check-input">
+                <label class="form-check-label" for="use24Hour" style="color: #fffde7;">24-hour format</label>
             </div>
         </div>
-    </div>
+        <div class="mb-3 pb-3" style="border-bottom: 1px solid rgba(255,215,0,0.15);">
+            <h6 class="mb-3" style="color: #ffd700; letter-spacing: 0.05em; font-size: 0.75rem; text-transform: uppercase;">World Clocks</h6>
+            <div class="form-check mb-2">
+                <input type="checkbox" id="showWorldClocks" class="form-check-input">
+                <label class="form-check-label" for="showWorldClocks" style="color: #fffde7;">Show world clocks</label>
+            </div>
+            <div id="worldClockSettings">
+                <div id="worldClockList" class="mb-2"></div>
+                <select id="timezoneSelect" class="form-select form-select-sm mb-2"
+                        style="background: rgba(255,255,255,0.05); color: #fffde7; border-color: rgba(255,215,0,0.25);">
+                    <option value="">Select timezone...</option>
+                    <option value="America/New_York">New York (EST/EDT)</option>
+                    <option value="America/Los_Angeles">Los Angeles (PST/PDT)</option>
+                    <option value="America/Chicago">Chicago (CST/CDT)</option>
+                    <option value="America/Denver">Denver (MST/MDT)</option>
+                    <option value="Europe/London">London (GMT/BST)</option>
+                    <option value="Europe/Paris">Paris (CET/CEST)</option>
+                    <option value="Europe/Monaco">Monaco (CET/CEST)</option>
+                    <option value="Europe/Berlin">Berlin (CET/CEST)</option>
+                    <option value="Europe/Rome">Rome (CET/CEST)</option>
+                    <option value="Europe/Madrid">Madrid (CET/CEST)</option>
+                    <option value="Asia/Tokyo">Tokyo (JST)</option>
+                    <option value="Asia/Shanghai">Shanghai (CST)</option>
+                    <option value="Asia/Hong_Kong">Hong Kong (HKT)</option>
+                    <option value="Asia/Singapore">Singapore (SGT)</option>
+                    <option value="Asia/Dubai">Dubai (GST)</option>
+                    <option value="Asia/Kolkata">Mumbai (IST)</option>
+                    <option value="Australia/Sydney">Sydney (AEST/AEDT)</option>
+                    <option value="Australia/Melbourne">Melbourne (AEST/AEDT)</option>
+                    <option value="Pacific/Auckland">Auckland (NZST/NZDT)</option>
+                    <option value="America/Sao_Paulo">São Paulo (BRT/BRST)</option>
+                    <option value="America/Mexico_City">Mexico City (CST/CDT)</option>
+                </select>
+                <button id="addWorldClockBtn" class="btn btn-sm w-100"
+                        style="background: rgba(255,215,0,0.12); color: #ffd700; border: 1px solid rgba(255,215,0,0.35);"
+                        disabled>Add World Clock</button>
+            </div>
+        </div>
+        <div>
+            <h6 class="mb-3" style="color: #ffd700; letter-spacing: 0.05em; font-size: 0.75rem; text-transform: uppercase;">Background</h6>
+            <div class="mb-2">
+                <label for="backgroundUpload" class="form-label" style="color: #fffde7; font-size: 0.8rem;">Upload image</label>
+                <input type="file" id="backgroundUpload" class="form-control form-control-sm"
+                       style="background: rgba(255,255,255,0.05); color: #fffde7; border-color: rgba(255,215,0,0.25);" accept="image/*">
+            </div>
+            <div class="mb-2">
+                <label for="opacitySlider" class="form-label" style="color: #fffde7; font-size: 0.8rem;">
+                    Opacity: <span id="opacityValue">50%</span>
+                </label>
+                <input type="range" id="opacitySlider" class="form-range" min="0" max="100" value="50">
+            </div>
+            <button id="resetBackground" class="btn btn-sm w-100"
+                    style="background: rgba(192,57,43,0.15); color: #e74c3c; border: 1px solid rgba(192,57,43,0.4);">Reset Background</button>
+        </div>`;
 
-    <!-- JavaScript Modules -->
-    <!-- Fallback for browsers that don't support ES6 modules -->
-    <script nomodule src="js/mobile-fallback.js"></script>
-    
-    <script>
-        // Check for ES6 module support and mobile compatibility
-        function checkMobileCompatibility() {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const supportsModules = 'noModule' in HTMLScriptElement.prototype;
-            
-            if (isMobile && !supportsModules) {
-                console.warn('ES6 modules not supported on this mobile browser, using fallback');
-                return false;
-            }
-            return true;
-        }
-        
-        console.log('Starting time display application...');
-        console.log('Mobile device detected:', /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
-        
-        // Load mobile fallback for older browsers
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        const supportsModules = 'noModule' in HTMLScriptElement.prototype;
-        
-        if (isMobile && !supportsModules) {
-            console.log('Loading mobile fallback script...');
-            const fallbackScript = document.createElement('script');
-            fallbackScript.src = 'js/mobile-fallback.js';
-            fallbackScript.onload = function() {
-                console.log('Mobile fallback loaded successfully');
-            };
-            fallbackScript.onerror = function() {
-                console.error('Failed to load mobile fallback');
-            };
-            document.head.appendChild(fallbackScript);
-        }
+    function setupSettings() {
+        var desktop = document.getElementById('desktopSettingsContent');
+        var mobile  = document.getElementById('mobileSettingsContent');
+        if (desktop) desktop.innerHTML = settingsHTML;
+        if (mobile)  mobile.innerHTML  = settingsHTML;
 
-        // Application state
-        let showSeconds = true;
-        let use24Hour = false;
-        let showWorldClocks = false;
-        let worldClocks = [];
-        let updateInterval = null;
-        let backgroundOpacity = 0.5;
+        bindSettingsListeners(desktop);
+        bindSettingsListeners(mobile);
+        syncAllFromState();
+        updateWorldClockList();
+        updateWorldClockDisplay();
+    }
 
-        // Initialize application when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('DOM loaded, initializing...');
+    function bindSettingsListeners(container) {
+        if (!container) return;
 
-            // Load settings from localStorage
-            loadSettings();
+        var showSecondsEl     = container.querySelector('#showSeconds');
+        var use24HourEl       = container.querySelector('#use24Hour');
+        var showWorldClocksEl = container.querySelector('#showWorldClocks');
+        var timezoneSelectEl  = container.querySelector('#timezoneSelect');
+        var addClockBtnEl     = container.querySelector('#addWorldClockBtn');
+        var opacitySliderEl   = container.querySelector('#opacitySlider');
+        var bgUploadEl        = container.querySelector('#backgroundUpload');
+        var resetBtnEl        = container.querySelector('#resetBackground');
 
-            // Start time display
-            startTimeDisplay();
-
-            // Setup settings functionality
-            setupSettings();
-
-            // Setup error handling
-            setupErrorHandling();
-
-            console.log('Application initialized successfully');
+        if (showSecondsEl) showSecondsEl.addEventListener('change', function () {
+            showSeconds = this.checked; syncAllFromState(); saveSettings();
         });
+        if (use24HourEl) use24HourEl.addEventListener('change', function () {
+            use24Hour = this.checked; syncAllFromState(); saveSettings();
+        });
+        if (showWorldClocksEl) showWorldClocksEl.addEventListener('change', function () {
+            showWorldClocks = this.checked; syncAllFromState(); saveSettings(); updateWorldClockDisplay();
+        });
+        if (timezoneSelectEl) timezoneSelectEl.addEventListener('change', function () {
+            syncAllFromState();
+        });
+        if (addClockBtnEl) addClockBtnEl.addEventListener('click', addWorldClock);
+        if (opacitySliderEl) opacitySliderEl.addEventListener('input', function () {
+            backgroundOpacity = parseInt(this.value) / 100;
+            updateBackgroundOpacity(); syncAllFromState(); saveSettings();
+        });
+        if (bgUploadEl)  bgUploadEl.addEventListener('change', handleBackgroundUpload);
+        if (resetBtnEl)  resetBtnEl.addEventListener('click', resetBackground);
+    }
 
-        // Load settings from localStorage
-        function loadSettings() {
+    function syncAllFromState() {
+        ['desktopSettingsContent','mobileSettingsContent'].forEach(function (id) {
+            var c = document.getElementById(id);
+            if (!c) return;
+            var el;
+            el = c.querySelector('#showSeconds');     if (el) el.checked = showSeconds;
+            el = c.querySelector('#use24Hour');       if (el) el.checked = use24Hour;
+            el = c.querySelector('#showWorldClocks'); if (el) el.checked = showWorldClocks;
+            el = c.querySelector('#opacitySlider');   if (el) el.value = Math.round(backgroundOpacity * 100);
+            el = c.querySelector('#opacityValue');    if (el) el.textContent = Math.round(backgroundOpacity * 100) + '%';
+            var tzEl = c.querySelector('#timezoneSelect');
+            var addBtn = c.querySelector('#addWorldClockBtn');
+            if (addBtn && tzEl) addBtn.disabled = !tzEl.value;
+        });
+    }
+
+    // ── World Clocks ──
+    function addWorldClock() {
+        var sel = document.getElementById('timezoneSelect');
+        if (!sel || !sel.value) return;
+        var tz = sel.value;
+        var city = sel.options[sel.selectedIndex].text.split(' (')[0];
+        if (worldClocks.some(function (w) { return w.timezone === tz; })) { alert('Already added'); return; }
+        if (worldClocks.length >= 3) { alert('Maximum 3 world clocks'); return; }
+        worldClocks.push({ id: 'wc_' + Date.now(), cityName: city, timezone: tz });
+        saveSettings();
+        updateWorldClockList();
+        updateWorldClockDisplay();
+        syncAllFromState();
+    }
+
+    function removeWorldClock(id) {
+        worldClocks = worldClocks.filter(function (w) { return w.id !== id; });
+        saveSettings();
+        updateWorldClockList();
+        updateWorldClockDisplay();
+    }
+
+    function updateWorldClockList() {
+        ['desktopSettingsContent','mobileSettingsContent'].forEach(function (panelId) {
+            var list = document.querySelector('#' + panelId + ' #worldClockList');
+            if (!list) return;
+            list.innerHTML = '';
+            worldClocks.forEach(function (wc) {
+                var item = document.createElement('div');
+                item.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0.5rem;margin-bottom:0.4rem;background:rgba(255,255,255,0.04);border-radius:6px;border:1px solid rgba(255,215,0,0.15);';
+                item.innerHTML = '<span style="color:#fffde7;font-size:0.8rem;">' + wc.cityName + '</span>'
+                    + '<button onclick="removeWorldClock(\'' + wc.id + '\')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:1rem;padding:0 0.25rem;">×</button>';
+                list.appendChild(item);
+            });
+        });
+    }
+
+    function updateWorldClockDisplay() {
+        var section   = document.getElementById('worldClocksSection');
+        var container = document.getElementById('worldClocksContainer');
+        if (!section || !container) return;
+        if (showWorldClocks && worldClocks.length > 0) {
+            section.hidden = false;
+            container.innerHTML = '';
+            worldClocks.forEach(function (wc) {
+                var card = document.createElement('div');
+                card.className = 'world-clock-display';
+                card.innerHTML = '<div class="world-clock-city-name">' + wc.cityName + '</div>'
+                    + '<div class="world-clock-time" id="worldClock_' + wc.id + '_time">--:--</div>'
+                    + '<div class="world-clock-date" id="worldClock_' + wc.id + '_date">...</div>';
+                container.appendChild(card);
+            });
+            updateWorldClockTimes();
+        } else {
+            section.hidden = true;
+        }
+    }
+
+    function updateWorldClockTimes() {
+        worldClocks.forEach(function (wc) {
             try {
-                const saved = localStorage.getItem('timeDisplaySettings');
-                if (saved) {
-                    const settings = JSON.parse(saved);
-                    showSeconds = settings.showSeconds !== undefined ? settings.showSeconds : true;
-                    use24Hour = settings.use24Hour !== undefined ? settings.use24Hour : false;
-                    showWorldClocks = settings.showWorldClocks !== undefined ? settings.showWorldClocks : false;
-                    worldClocks = settings.worldClocks || [];
-                    backgroundOpacity = settings.backgroundOpacity !== undefined ? settings.backgroundOpacity : 0.5;
-                }
-            } catch (error) {
-                console.warn('Failed to load settings:', error);
-            }
-
-            // Update UI to reflect loaded settings
-            const showSecondsCheckbox = document.getElementById('showSeconds');
-            const use24HourCheckbox = document.getElementById('use24Hour');
-            const showWorldClocksCheckbox = document.getElementById('showWorldClocks');
-
-            if (showSecondsCheckbox) {
-                showSecondsCheckbox.checked = showSeconds;
-            }
-            if (use24HourCheckbox) {
-                use24HourCheckbox.checked = use24Hour;
-            }
-            if (showWorldClocksCheckbox) {
-                showWorldClocksCheckbox.checked = showWorldClocks;
-            }
-            
-            // Update opacity slider
-            const opacitySlider = document.getElementById('opacitySlider');
-            const opacityValue = document.getElementById('opacityValue');
-            if (opacitySlider) {
-                opacitySlider.value = Math.round(backgroundOpacity * 100);
-            }
-            if (opacityValue) {
-                opacityValue.textContent = Math.round(backgroundOpacity * 100) + '%';
-            }
-            
-            // Apply saved background
-            applySavedBackground();
-        }
-
-        // Save settings to localStorage
-        function saveSettings() {
-            try {
-                const settings = {
-                    showSeconds: showSeconds,
-                    use24Hour: use24Hour,
-                    showWorldClocks: showWorldClocks,
-                    worldClocks: worldClocks,
-                    backgroundOpacity: backgroundOpacity,
-                    backgroundImage: localStorage.getItem('backgroundImage')
-                };
-                localStorage.setItem('timeDisplaySettings', JSON.stringify(settings));
-                console.log('Settings saved:', settings);
-            } catch (error) {
-                console.warn('Failed to save settings:', error);
-            }
-        }
-
-        // Start time display
-        function startTimeDisplay() {
-            const timeElement = document.getElementById('timeText');
-            const dateElement = document.getElementById('dateText');
-            const ampmElement = document.getElementById('ampmText');
-            const statusText = document.getElementById('statusText');
-            const statusIndicator = document.getElementById('statusIndicator');
-
-            if (!timeElement || !dateElement) {
-                console.error('Required time display elements not found');
-                return;
-            }
-
-            function updateTime() {
-                const now = new Date();
-
-                // Format time
-                let hours = now.getHours();
-                const minutes = now.getMinutes();
-                const seconds = now.getSeconds();
-                let ampm = '';
-
-                if (!use24Hour) {
-                    ampm = hours >= 12 ? 'PM' : 'AM';
-                    hours = hours % 12;
-                    if (hours === 0) hours = 12;
-                }
-
-                const formattedHours = hours.toString().padStart(2, '0');
-                const formattedMinutes = minutes.toString().padStart(2, '0');
-                const formattedSeconds = seconds.toString().padStart(2, '0');
-
-                let timeString = formattedHours + ':' + formattedMinutes;
-                if (showSeconds) {
-                    timeString += ':' + formattedSeconds;
-                }
-
-                // Add AM/PM to the same span with smaller styling
-                if (!use24Hour && ampm) {
-                    timeString += '&nbsp;<span class="ampm-text">' + ampm + '</span>';
-                }
-
-                timeElement.innerHTML = timeString;
-
-                // Format date with week number
-                const weekdayOptions = { weekday: 'long' };
-                const dateOptions = {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                };
-                const weekdayString = now.toLocaleDateString('en-US', weekdayOptions);
-                const dateOnlyString = now.toLocaleDateString('en-US', dateOptions);
-                const weekNumber = getWeekNumber(now);
-                const dateString = weekdayString + ', <span class="date-highlight">' + dateOnlyString + '</span>, week ' + weekNumber;
-                dateElement.innerHTML = dateString;
-                
-                // Update Christmas countdown
-                updateChristmasCountdown();
-                
-                // Update world clocks if they are shown
-                if (showWorldClocks && worldClocks.length > 0) {
-                    updateWorldClockTimes();
-                }
-            }
-
-            // Update immediately and then every second
-            updateTime();
-            if (updateInterval) {
-                clearInterval(updateInterval);
-            }
-            updateInterval = setInterval(updateTime, 1000);
-
-            // Update status
-            if (statusText) {
-                statusText.textContent = 'Local time';
-            }
-            if (statusIndicator) {
-                statusIndicator.className = 'status-indicator disconnected';
-            }
-
-            console.log('Time display started');
-        }
-
-        // Setup settings functionality - Bootstrap Only
-        function setupSettings() {
-            const desktopSettingsContent = document.getElementById('desktopSettingsContent');
-            const mobileSettingsContent = document.getElementById('mobileSettingsContent');
-
-            // Create the settings HTML template
-            const settingsHTML = `
-                <div class="settings-group mb-4">
-                    <h6 class="text-light mb-3">Display Settings</h6>
-                    <div class="form-check mb-3">
-                        <input type="checkbox" id="showSeconds" class="form-check-input">
-                        <label class="form-check-label text-light" for="showSeconds">Show seconds</label>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input type="checkbox" id="use24Hour" class="form-check-input">
-                        <label class="form-check-label text-light" for="use24Hour">24-hour format</label>
-                    </div>
-                </div>
-
-                <div class="settings-group mb-4">
-                    <h6 class="text-light mb-3">World Clocks</h6>
-                    <div class="form-check mb-3">
-                        <input type="checkbox" id="showWorldClocks" class="form-check-input">
-                        <label class="form-check-label text-light" for="showWorldClocks">Show world clocks</label>
-                    </div>
-                    <div class="world-clock-settings" id="worldClockSettings">
-                        <div class="world-clock-list mb-3" id="worldClockList"></div>
-                        <div class="add-world-clock" id="addWorldClockSection">
-                            <select id="timezoneSelect" class="form-select form-select-sm bg-dark text-light border-secondary mb-2">
-                                <option value="">Select a timezone...</option>
-                                <option value="America/New_York">New York (EST/EDT)</option>
-                                <option value="America/Los_Angeles">Los Angeles (PST/PDT)</option>
-                                <option value="America/Chicago">Chicago (CST/CDT)</option>
-                                <option value="America/Denver">Denver (MST/MDT)</option>
-                                <option value="Europe/London">London (GMT/BST)</option>
-                                <option value="Europe/Paris">Paris (CET/CEST)</option>
-                                <option value="Europe/Monaco">Monaco (CET/CEST)</option>
-                                <option value="Europe/Berlin">Berlin (CET/CEST)</option>
-                                <option value="Europe/Rome">Rome (CET/CEST)</option>
-                                <option value="Europe/Madrid">Madrid (CET/CEST)</option>
-                                <option value="Asia/Tokyo">Tokyo (JST)</option>
-                                <option value="Asia/Shanghai">Shanghai (CST)</option>
-                                <option value="Asia/Hong_Kong">Hong Kong (HKT)</option>
-                                <option value="Asia/Singapore">Singapore (SGT)</option>
-                                <option value="Asia/Dubai">Dubai (GST)</option>
-                                <option value="Asia/Kolkata">Mumbai (IST)</option>
-                                <option value="Australia/Sydney">Sydney (AEST/AEDT)</option>
-                                <option value="Australia/Melbourne">Melbourne (AEST/AEDT)</option>
-                                <option value="Pacific/Auckland">Auckland (NZST/NZDT)</option>
-                                <option value="America/Sao_Paulo">São Paulo (BRT/BRST)</option>
-                                <option value="America/Mexico_City">Mexico City (CST/CDT)</option>
-                            </select>
-                            <button id="addWorldClockBtn" class="btn btn-outline-primary btn-sm w-100" disabled>
-                                Add World Clock
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="settings-group">
-                    <h6 class="text-light mb-3">Background</h6>
-                    <div class="mb-3">
-                        <label for="backgroundUpload" class="form-label text-light">Upload Background</label>
-                        <input type="file" id="backgroundUpload" class="form-control form-control-sm bg-dark text-light border-secondary" accept="image/*">
-                    </div>
-                    <div class="mb-3">
-                        <label for="opacitySlider" class="form-label text-light">
-                            Background Opacity: <span class="opacity-value" id="opacityValue">50%</span>
-                        </label>
-                        <input type="range" id="opacitySlider" class="form-range" min="0" max="100" value="50">
-                    </div>
-                    <button class="btn btn-outline-danger btn-sm w-100" id="resetBackground">
-                        Reset to Default
-                    </button>
-                </div>
-            `;
-
-            // Populate both desktop and mobile settings
-            if (desktopSettingsContent) {
-                desktopSettingsContent.innerHTML = settingsHTML;
-            }
-            if (mobileSettingsContent) {
-                mobileSettingsContent.innerHTML = settingsHTML;
-            }
-
-            // Add event listeners to both panels
-            function addSettingsListeners(container, prefix = '') {
-                if (!container) return;
-                
-                const showSecondsCheck = container.querySelector('#showSeconds');
-                const use24HourCheck = container.querySelector('#use24Hour');
-                const showWorldClocksCheck = container.querySelector('#showWorldClocks');
-                const timezoneSelect = container.querySelector('#timezoneSelect');
-                const addWorldClockBtn = container.querySelector('#addWorldClockBtn');
-                const opacitySlider = container.querySelector('#opacitySlider');
-                const backgroundUpload = container.querySelector('#backgroundUpload');
-                const resetButton = container.querySelector('#resetBackground');
-                
-                if (showSecondsCheck) {
-                    showSecondsCheck.addEventListener('change', function () {
-                        showSeconds = this.checked;
-                        syncSettingsBetweenPanels('showSeconds', this.checked);
-                        saveSettings();
-                    });
-                }
-                
-                if (use24HourCheck) {
-                    use24HourCheck.addEventListener('change', function () {
-                        use24Hour = this.checked;
-                        syncSettingsBetweenPanels('use24Hour', this.checked);
-                        saveSettings();
-                    });
-                }
-                
-                if (showWorldClocksCheck) {
-                    showWorldClocksCheck.addEventListener('change', function() {
-                        showWorldClocks = this.checked;
-                        syncSettingsBetweenPanels('showWorldClocks', this.checked);
-                        saveSettings();
-                        updateWorldClockDisplay();
-                    });
-                }
-                
-                if (timezoneSelect && addWorldClockBtn) {
-                    timezoneSelect.addEventListener('change', function() {
-                        addWorldClockBtn.disabled = !this.value;
-                        syncSettingsBetweenPanels('timezoneSelect', this.value);
-                    });
-                    
-                    addWorldClockBtn.addEventListener('click', function() {
-                        addWorldClock();
-                    });
-                }
-                
-                if (opacitySlider) {
-                    opacitySlider.addEventListener('input', function(e) {
-                        backgroundOpacity = parseInt(e.target.value) / 100;
-                        updateBackgroundOpacity();
-                        syncSettingsBetweenPanels('opacitySlider', e.target.value);
-                        saveSettings();
-                        
-                        // Update opacity display in both panels
-                        const opacityValue = container.querySelector('#opacityValue');
-                        if (opacityValue) {
-                            opacityValue.textContent = e.target.value + '%';
-                        }
-                    });
-                }
-                
-                if (backgroundUpload) {
-                    backgroundUpload.addEventListener('change', function(e) {
-                        handleBackgroundUpload(e);
-                    });
-                }
-                
-                if (resetButton) {
-                    resetButton.addEventListener('click', function() {
-                        resetBackground();
-                    });
-                }
-            }
-
-            // Sync settings between desktop and mobile panels
-            function syncSettingsBetweenPanels(elementId, value) {
-                const desktopElement = desktopSettingsContent?.querySelector(`#${elementId}`);
-                const mobileElement = mobileSettingsContent?.querySelector(`#${elementId}`);
-                
-                if (desktopElement && mobileElement) {
-                    if (desktopElement.type === 'checkbox') {
-                        desktopElement.checked = value;
-                        mobileElement.checked = value;
-                    } else {
-                        desktopElement.value = value;
-                        mobileElement.value = value;
-                    }
-                    
-                    // Update opacity displays
-                    if (elementId === 'opacitySlider') {
-                        const desktopOpacityValue = desktopSettingsContent?.querySelector('#opacityValue');
-                        const mobileOpacityValue = mobileSettingsContent?.querySelector('#opacityValue');
-                        if (desktopOpacityValue) desktopOpacityValue.textContent = value + '%';
-                        if (mobileOpacityValue) mobileOpacityValue.textContent = value + '%';
-                    }
-                }
-            }
-
-            // Add listeners to both panels
-            addSettingsListeners(desktopSettingsContent, 'desktop');
-            addSettingsListeners(mobileSettingsContent, 'mobile');
-
-            // Load initial settings
-            const desktopShowSeconds = desktopSettingsContent?.querySelector('#showSeconds');
-            const mobileShowSeconds = mobileSettingsContent?.querySelector('#showSeconds');
-            const desktopUse24Hour = desktopSettingsContent?.querySelector('#use24Hour');
-            const mobileUse24Hour = mobileSettingsContent?.querySelector('#use24Hour');
-            const desktopOpacitySlider = desktopSettingsContent?.querySelector('#opacitySlider');
-            const mobileOpacitySlider = mobileSettingsContent?.querySelector('#opacitySlider');
-
-            if (desktopShowSeconds) desktopShowSeconds.checked = showSeconds;
-            if (mobileShowSeconds) mobileShowSeconds.checked = showSeconds;
-            if (desktopUse24Hour) desktopUse24Hour.checked = use24Hour;
-            if (mobileUse24Hour) mobileUse24Hour.checked = use24Hour;
-            if (desktopOpacitySlider) desktopOpacitySlider.value = Math.round(backgroundOpacity * 100);
-            if (mobileOpacitySlider) mobileOpacitySlider.value = Math.round(backgroundOpacity * 100);
-
-            // Initialize world clock display
-            updateWorldClockDisplay();
-            updateWorldClockList();
-
-            console.log('Bootstrap-only settings functionality initialized');
-        }
-
-        // Setup error handling
-        function setupErrorHandling() {
-            const errorClose = document.getElementById('errorClose');
-
-            if (errorClose) {
-                errorClose.addEventListener('click', function () {
-                    const errorMessage = document.getElementById('errorMessage');
-                    if (errorMessage) {
-                        // Try to use Bootstrap toast if available
-                        if (window.bootstrap && bootstrap.Toast) {
-                            const toast = bootstrap.Toast.getInstance(errorMessage);
-                            if (toast) {
-                                toast.hide();
-                            }
-                        } else {
-                            errorMessage.hidden = true;
-                        }
-                    }
+                var now = new Date();
+                var tEl = document.getElementById('worldClock_' + wc.id + '_time');
+                var dEl = document.getElementById('worldClock_' + wc.id + '_date');
+                if (tEl) tEl.textContent = now.toLocaleTimeString('en-US', {
+                    timeZone: wc.timezone, hour12: !use24Hour,
+                    hour: '2-digit', minute: '2-digit',
+                    second: showSeconds ? '2-digit' : undefined
                 });
+                if (dEl) dEl.textContent = now.toLocaleDateString('en-US', {
+                    timeZone: wc.timezone, weekday: 'short', month: 'short', day: 'numeric'
+                });
+            } catch (e) {
+                var tEl = document.getElementById('worldClock_' + wc.id + '_time');
+                if (tEl) tEl.textContent = 'Error';
             }
+        });
+    }
+
+    // ── Background ──
+    function handleBackgroundUpload(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { alert('Please select an image file'); return; }
+        if (file.size > 5 * 1024 * 1024) { alert('Max image size is 5MB'); return; }
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+            try {
+                localStorage.setItem('backgroundImage', ev.target.result);
+                applyBackgroundImage(ev.target.result);
+                saveSettings();
+            } catch (err) { alert('Failed to save background image'); }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function applyBackgroundImage(data) {
+        var el = document.getElementById('backgroundOverlay');
+        if (el && data) {
+            el.style.backgroundImage  = 'url(' + data + ')';
+            el.style.backgroundSize   = 'cover';
+            el.style.backgroundPosition = 'center';
+            updateBackgroundOpacity();
         }
-        
-        // World Clock Functions
-        function addWorldClock() {
-            const timezoneSelect = document.getElementById('timezoneSelect');
-            if (!timezoneSelect || !timezoneSelect.value) return;
-            
-            const timezone = timezoneSelect.value;
-            const cityName = timezoneSelect.options[timezoneSelect.selectedIndex].text.split(' (')[0];
-            
-            // Check if already exists
-            if (worldClocks.some(wc => wc.timezone === timezone)) {
-                alert('This timezone is already added');
-                return;
-            }
-            
-            // Check maximum limit
-            if (worldClocks.length >= 3) {
-                alert('Maximum of 3 world clocks allowed');
-                return;
-            }
-            
-            // Add new world clock
-            const worldClock = {
-                id: 'wc_' + Date.now(),
-                cityName: cityName,
-                timezone: timezone
-            };
-            
-            worldClocks.push(worldClock);
-            saveSettings();
-            updateWorldClockList();
-            updateWorldClockDisplay();
-            
-            // Reset selector
-            timezoneSelect.value = '';
-            document.getElementById('addWorldClockBtn').disabled = true;
-            
-            console.log('Added world clock:', worldClock);
+    }
+
+    function updateBackgroundOpacity() {
+        var el = document.getElementById('backgroundOverlay');
+        if (el) el.style.opacity = backgroundOpacity;
+    }
+
+    function applySavedBackground() {
+        try {
+            var img = localStorage.getItem('backgroundImage');
+            if (img) applyBackgroundImage(img);
+            updateBackgroundOpacity();
+        } catch (e) {}
+    }
+
+    function resetBackground() {
+        var el = document.getElementById('backgroundOverlay');
+        if (el) { el.style.backgroundImage = ''; el.style.opacity = '0.5'; }
+        backgroundOpacity = 0.5;
+        localStorage.removeItem('backgroundImage');
+        saveSettings();
+        syncAllFromState();
+    }
+
+    // ── Error handling ──
+    function setupErrorHandling() {
+        var closeBtn = document.getElementById('errorClose');
+        if (closeBtn) closeBtn.addEventListener('click', function () {
+            var el = document.getElementById('errorMessage');
+            if (el) el.hidden = true;
+        });
+    }
+
+    window.addEventListener('error', function (e) { console.error('Uncaught error:', e.error); });
+    window.addEventListener('unhandledrejection', function (e) { console.error('Unhandled rejection:', e.reason); e.preventDefault(); });
+
+    // ── Christmas: String Lights ──
+    (function () {
+        var strand = document.getElementById('lights-strand');
+        if (!strand) return;
+        var colors = ['red','green','gold','blue','white','red','green','gold','blue','white'];
+        for (var i = 0; i < 20; i++) {
+            var wrap = document.createElement('div'); wrap.className = 'bulb-wrap';
+            var wire = document.createElement('div'); wire.className = 'bulb-wire';
+            var bulb = document.createElement('div'); bulb.className = 'bulb ' + colors[i % colors.length];
+            wrap.appendChild(wire); wrap.appendChild(bulb);
+            strand.appendChild(wrap);
         }
-        
-        function removeWorldClock(id) {
-            worldClocks = worldClocks.filter(wc => wc.id !== id);
-            saveSettings();
-            updateWorldClockList();
-            updateWorldClockDisplay();
-            console.log('Removed world clock:', id);
+    })();
+
+    // ── Christmas: Snow ──
+    (function () {
+        var canvas = document.getElementById('snow-canvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resize();
+        window.addEventListener('resize', resize);
+        var flakes = Array.from({ length: 80 }, function () { return {
+            x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight,
+            r: 1.5 + Math.random() * 3, speed: 0.4 + Math.random() * 0.8,
+            drift: (Math.random() - 0.5) * 0.4, opacity: 0.3 + Math.random() * 0.5
+        }; });
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            flakes.forEach(function (f) {
+                ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,' + f.opacity + ')'; ctx.fill();
+                f.y += f.speed; f.x += f.drift;
+                if (f.y > canvas.height + 10) { f.y = -10; f.x = Math.random() * canvas.width; }
+                if (f.x > canvas.width + 10)  f.x = -10;
+                if (f.x < -10)                f.x = canvas.width + 10;
+            });
+            requestAnimationFrame(draw);
         }
-        
-        function updateWorldClockList() {
-            const worldClockList = document.getElementById('worldClockList');
-            if (!worldClockList) return;
-            
-            worldClockList.innerHTML = '';
-            
-            worldClocks.forEach(function(worldClock) {
-                const item = document.createElement('div');
-                item.className = 'world-clock-item d-flex justify-content-between align-items-center p-2 mb-2 bg-dark border border-secondary rounded';
-                item.innerHTML = 
-                    '<div class="world-clock-info flex-grow-1">' +
-                        '<div class="world-clock-city text-light fw-medium">' + worldClock.cityName + '</div>' +
-                        '<div class="world-clock-timezone text-muted small">' + worldClock.timezone + '</div>' +
-                    '</div>' +
-                    '<div class="world-clock-controls">' +
-                        '<button class="btn btn-outline-danger btn-sm" onclick="removeWorldClock(\'' + worldClock.id + '\')" aria-label="Remove ' + worldClock.cityName + ' world clock">×</button>' +
-                    '</div>';
-                
-                worldClockList.appendChild(item);
+        draw();
+    })();
+
+    // ── Christmas: Village ──
+    (function () {
+        var vc = document.getElementById('village-canvas');
+        if (!vc) return;
+        var vctx = vc.getContext('2d');
+
+        function pineTree(ctx, cx, gy, w, h) {
+            var trunkH = h * 0.18;
+            ctx.fillStyle = '#2d1200';
+            ctx.fillRect(cx - 4, gy - trunkH, 8, trunkH);
+            var tiers = [
+                { base: 0, peak: 0.42, wf: 1.0, snow: 0.55 },
+                { base: 0.30, peak: 0.68, wf: 0.70, snow: 0.45 },
+                { base: 0.58, peak: 0.88, wf: 0.44, snow: 0.32 }
+            ];
+            tiers.forEach(function (t, i) {
+                var by = gy - trunkH - (h - trunkH) * t.base;
+                var py = gy - trunkH - (h - trunkH) * t.peak;
+                var hw = (w / 2) * t.wf;
+                ctx.beginPath();
+                ctx.moveTo(cx - hw, by); ctx.lineTo(cx + hw, by); ctx.lineTo(cx, py);
+                ctx.closePath();
+                ctx.fillStyle = 'hsl(135,52%,' + (8 + i * 2) + '%)'; ctx.fill();
+                var shw = hw * t.snow;
+                ctx.beginPath();
+                ctx.moveTo(cx - shw, by); ctx.lineTo(cx + shw, by); ctx.lineTo(cx, py - 3);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(235,250,240,0.78)'; ctx.fill();
             });
         }
-        
-        function updateWorldClockDisplay() {
-            const worldClocksSection = document.getElementById('worldClocksSection');
-            const worldClocksContainer = document.getElementById('worldClocksContainer');
-            
-            if (!worldClocksSection || !worldClocksContainer) return;
-            
-            if (showWorldClocks && worldClocks.length > 0) {
-                worldClocksSection.hidden = false;
-                worldClocksContainer.innerHTML = '';
-                
-                worldClocks.forEach(function(worldClock) {
-                    // Create Bootstrap column
-                    const colDiv = document.createElement('div');
-                    colDiv.className = 'col-12 col-md-6 col-lg-4';
-                    
-                    const display = document.createElement('div');
-                    display.className = 'world-clock-display card bg-dark border-secondary h-100';
-                    display.innerHTML = 
-                        '<div class="card-body text-center">' +
-                            '<h6 class="world-clock-city-name card-title text-light">' + worldClock.cityName + '</h6>' +
-                            '<div class="world-clock-time h4 text-light mb-2" id="worldClock_' + worldClock.id + '_time">--:--</div>' +
-                            '<div class="world-clock-date text-muted small" id="worldClock_' + worldClock.id + '_date">Loading...</div>' +
-                        '</div>';
-                    
-                    colDiv.appendChild(display);
-                    worldClocksContainer.appendChild(colDiv);
-                });
-                
-                updateWorldClockTimes();
-            } else {
-                worldClocksSection.hidden = true;
-            }
-        }
-        
-        function updateWorldClockTimes() {
-            worldClocks.forEach(function(worldClock) {
-                try {
-                    const now = new Date();
-                    const timeElement = document.getElementById('worldClock_' + worldClock.id + '_time');
-                    const dateElement = document.getElementById('worldClock_' + worldClock.id + '_date');
-                    
-                    if (timeElement && dateElement) {
-                        // Format time for timezone
-                        const timeString = now.toLocaleTimeString('en-US', {
-                            timeZone: worldClock.timezone,
-                            hour12: !use24Hour,
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: showSeconds ? '2-digit' : undefined
-                        });
-                        
-                        // Format date for timezone
-                        const dateString = now.toLocaleDateString('en-US', {
-                            timeZone: worldClock.timezone,
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric'
-                        });
-                        
-                        timeElement.textContent = timeString;
-                        dateElement.textContent = dateString;
-                    }
-                } catch (error) {
-                    console.error('Error updating world clock time for', worldClock.cityName, error);
-                    const timeElement = document.getElementById('worldClock_' + worldClock.id + '_time');
-                    const dateElement = document.getElementById('worldClock_' + worldClock.id + '_date');
-                    if (timeElement) timeElement.textContent = 'Error';
-                    if (dateElement) dateElement.textContent = 'Timezone unavailable';
-                }
+
+        function farTree(ctx, cx, gy, w, h) {
+            var trunkH = h * 0.18;
+            ctx.fillStyle = 'rgba(20,50,25,0.45)';
+            ctx.fillRect(cx - 3, gy - trunkH, 6, trunkH);
+            [[1.0,0,0.4],[0.68,0.32,0.38],[0.42,0.60,0.34]].forEach(function (t) {
+                var by = gy - trunkH - (h - trunkH) * t[1];
+                var py = by - (h - trunkH) * t[2];
+                var hw = (w / 2) * t[0];
+                ctx.beginPath();
+                ctx.moveTo(cx - hw, by); ctx.lineTo(cx + hw, by); ctx.lineTo(cx, py);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(18,48,22,0.42)'; ctx.fill();
             });
         }
-        
-        // Background Functions
-        function handleBackgroundUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            // Validate file type
-            if (!file.type.startsWith('image/')) {
-                alert('Please select an image file');
-                return;
-            }
-            
-            // Validate file size (5MB limit)
-            const maxSize = 5 * 1024 * 1024; // 5MB
-            if (file.size > maxSize) {
-                alert('Image file is too large. Maximum size is 5MB.');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imageData = e.target.result;
-                    localStorage.setItem('backgroundImage', imageData);
-                    applyBackgroundImage(imageData);
-                    saveSettings();
-                    console.log('Background image uploaded successfully');
-                } catch (error) {
-                    console.error('Failed to save background image:', error);
-                    alert('Failed to save background image. It may be too large.');
-                }
-            };
-            
-            reader.onerror = function() {
-                alert('Failed to read the image file');
-            };
-            
-            reader.readAsDataURL(file);
-        }
-        
-        function applyBackgroundImage(imageData) {
-            const backgroundOverlay = document.getElementById('backgroundOverlay');
-            if (backgroundOverlay && imageData) {
-                backgroundOverlay.style.backgroundImage = 'url(' + imageData + ')';
-                backgroundOverlay.style.backgroundSize = 'cover';
-                backgroundOverlay.style.backgroundPosition = 'center';
-                backgroundOverlay.style.backgroundRepeat = 'no-repeat';
-                updateBackgroundOpacity();
-            }
-        }
-        
-        function updateBackgroundOpacity() {
-            const backgroundOverlay = document.getElementById('backgroundOverlay');
-            if (backgroundOverlay) {
-                backgroundOverlay.style.opacity = backgroundOpacity;
-            }
-        }
-        
-        function applySavedBackground() {
-            try {
-                const savedImage = localStorage.getItem('backgroundImage');
-                if (savedImage) {
-                    applyBackgroundImage(savedImage);
-                }
-                updateBackgroundOpacity();
-            } catch (error) {
-                console.error('Failed to apply saved background:', error);
-            }
-        }
-        
-        function resetBackground() {
-            const backgroundOverlay = document.getElementById('backgroundOverlay');
-            if (backgroundOverlay) {
-                backgroundOverlay.style.backgroundImage = '';
-                backgroundOverlay.style.opacity = '0.5';
-            }
-            
-            // Reset opacity slider
-            const opacitySlider = document.getElementById('opacitySlider');
-            const opacityValue = document.getElementById('opacityValue');
-            if (opacitySlider) {
-                opacitySlider.value = 50;
-            }
-            if (opacityValue) {
-                opacityValue.textContent = '50%';
-            }
-            
-            backgroundOpacity = 0.5;
-            
-            // Clear from localStorage
-            localStorage.removeItem('backgroundImage');
-            saveSettings();
-            
-            // Clear file input
-            const backgroundUpload = document.getElementById('backgroundUpload');
-            if (backgroundUpload) {
-                backgroundUpload.value = '';
-            }
-            
-            console.log('Background reset to default');
-        }
-        
-        // Christmas Countdown Function
-        function updateChristmasCountdown() {
-            const countdownElement = document.getElementById('countdownText');
-            if (!countdownElement) return;
-            
-            const now = new Date();
-            const currentYear = now.getFullYear();
-            
-            // Christmas date for this year
-            let christmas = new Date(currentYear, 11, 25); // December 25th
-            
-            // If Christmas has passed this year, calculate for next year
-            if (now > christmas) {
-                christmas = new Date(currentYear + 1, 11, 25);
-            }
-            
-            // Calculate the difference in milliseconds
-            const timeDiff = christmas.getTime() - now.getTime();
-            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-            
-            // Update the display
-            if (daysDiff === 0) {
-                // It's Christmas Day!
-                countdownElement.innerHTML = '🎄 Merry Christmas! 🎅';
-                countdownElement.classList.add('christmas-day');
-            } else if (daysDiff === 1) {
-                countdownElement.innerHTML = '🎄 Christmas is tomorrow! 🎁';
-                countdownElement.classList.remove('christmas-day');
-            } else if (daysDiff <= 7) {
-                countdownElement.innerHTML = `🎄 <span class="countdown-number">${daysDiff}</span> days until Christmas! 🎁`;
-                countdownElement.classList.remove('christmas-day');
-            } else if (daysDiff <= 30) {
-                countdownElement.innerHTML = `🎄 <span class="countdown-number">${daysDiff}</span> days until Christmas 🎅`;
-                countdownElement.classList.remove('christmas-day');
-            } else {
-                countdownElement.innerHTML = `🎄 <span class="countdown-number">${daysDiff}</span> days until Christmas`;
-                countdownElement.classList.remove('christmas-day');
-            }
-        }
-        
-        // Week Number Calculation Function
-        function getWeekNumber(date) {
-            // Create a copy of the date to avoid modifying the original
-            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-            
-            // Set to nearest Thursday: current date + 4 - current day number
-            // Make Sunday's day number 7
-            const dayNum = d.getUTCDay() || 7;
-            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            
-            // Get first day of year
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            
-            // Calculate full weeks to nearest Thursday
-            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-        }
 
-        // Global error handlers
-        window.addEventListener('error', function (event) {
-            console.error('Uncaught error:', event.error);
-        });
-
-        window.addEventListener('unhandledrejection', function (event) {
-            console.error('Unhandled promise rejection:', event.reason);
-            event.preventDefault();
-        });
-
-        // ── Christmas: String Lights ──
-        (function () {
-            var strand = document.getElementById('lights-strand');
-            if (!strand) return;
-            var colors = ['red','green','gold','blue','white','red','green','gold','blue','white'];
-            for (var i = 0; i < 20; i++) {
-                var wrap = document.createElement('div');
-                wrap.className = 'bulb-wrap';
-                var wire = document.createElement('div');
-                wire.className = 'bulb-wire';
-                var bulb = document.createElement('div');
-                bulb.className = 'bulb ' + colors[i % colors.length];
-                wrap.appendChild(wire);
-                wrap.appendChild(bulb);
-                strand.appendChild(wrap);
-            }
-        })();
-
-        // ── Christmas: Snow ──
-        (function () {
-            var canvas = document.getElementById('snow-canvas');
-            if (!canvas) return;
-            var ctx = canvas.getContext('2d');
-            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-            resize();
-            window.addEventListener('resize', resize);
-            var flakes = Array.from({ length: 80 }, function () { return {
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
-                r: 1.5 + Math.random() * 3,
-                speed: 0.4 + Math.random() * 0.8,
-                drift: (Math.random() - 0.5) * 0.4,
-                opacity: 0.3 + Math.random() * 0.5
-            }; });
-            function drawSnow() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                flakes.forEach(function (f) {
-                    ctx.beginPath();
-                    ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-                    ctx.fillStyle = 'rgba(255,255,255,' + f.opacity + ')';
-                    ctx.fill();
-                    f.y += f.speed; f.x += f.drift;
-                    if (f.y > canvas.height + 10) { f.y = -10; f.x = Math.random() * canvas.width; }
-                    if (f.x > canvas.width + 10)  { f.x = -10; }
-                    if (f.x < -10)                { f.x = canvas.width + 10; }
-                });
-                requestAnimationFrame(drawSnow);
-            }
-            drawSnow();
-        })();
-
-        // ── Christmas: Village ──
-        (function () {
-            var vc = document.getElementById('village-canvas');
-            if (!vc) return;
-            var vctx = vc.getContext('2d');
-
-            function pineTree(ctx, cx, gy, w, h) {
-                var trunkH = h * 0.18;
-                ctx.fillStyle = '#2d1200';
-                ctx.fillRect(cx - 4, gy - trunkH, 8, trunkH);
-                var tiers = [
-                    { base: 0, peak: 0.42, wf: 1.0, snow: 0.55 },
-                    { base: 0.30, peak: 0.68, wf: 0.70, snow: 0.45 },
-                    { base: 0.58, peak: 0.88, wf: 0.44, snow: 0.32 }
-                ];
-                tiers.forEach(function (t, i) {
-                    var by = gy - trunkH - (h - trunkH) * t.base;
-                    var py = gy - trunkH - (h - trunkH) * t.peak;
-                    var hw = (w / 2) * t.wf;
-                    ctx.beginPath();
-                    ctx.moveTo(cx - hw, by); ctx.lineTo(cx + hw, by); ctx.lineTo(cx, py);
-                    ctx.closePath();
-                    ctx.fillStyle = 'hsl(135,52%,' + (8 + i * 2) + '%)';
-                    ctx.fill();
-                    var shw = hw * t.snow;
-                    ctx.beginPath();
-                    ctx.moveTo(cx - shw, by); ctx.lineTo(cx + shw, by); ctx.lineTo(cx, py - 3);
-                    ctx.closePath();
-                    ctx.fillStyle = 'rgba(235,250,240,0.78)';
-                    ctx.fill();
+        function house(ctx, x, gy, w, h, roofH, chimney, wins) {
+            var top = gy - h, cx = x + w / 2, peak = top - roofH;
+            ctx.fillStyle = '#091a0d'; ctx.fillRect(x, top, w, h);
+            ctx.beginPath();
+            ctx.moveTo(x - 6, top); ctx.lineTo(x + w + 6, top); ctx.lineTo(cx, peak);
+            ctx.closePath(); ctx.fillStyle = '#050e08'; ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(x - 6, top); ctx.lineTo(x + w + 6, top); ctx.lineTo(cx, peak - 5);
+            ctx.closePath(); ctx.fillStyle = 'rgba(232,248,238,0.82)'; ctx.fill();
+            if (chimney) {
+                var chX = x + w * 0.72, chW = Math.max(8, w * 0.1);
+                var slopeY = top + roofH * ((chX - (x + w + 6)) / (cx - (x + w + 6)));
+                var chH = roofH * 0.65;
+                ctx.fillStyle = '#0a1208'; ctx.fillRect(chX, slopeY - chH, chW, chH + 2);
+                ctx.fillStyle = 'rgba(232,248,238,0.85)'; ctx.fillRect(chX - 2, slopeY - chH, chW + 4, 4);
+                [0,1,2].forEach(function (i) {
+                    ctx.beginPath(); ctx.arc(chX + chW/2 + i*3, slopeY - chH - 10 - i*10, 5 + i*2, 0, Math.PI*2);
+                    ctx.fillStyle = 'rgba(200,210,205,' + (0.10 - i*0.025) + ')'; ctx.fill();
                 });
             }
-
-            function farTree(ctx, cx, gy, w, h) {
-                var trunkH = h * 0.18;
-                ctx.fillStyle = 'rgba(20,50,25,0.45)';
-                ctx.fillRect(cx - 3, gy - trunkH, 6, trunkH);
-                [[1.0, 0, 0.4], [0.68, 0.32, 0.38], [0.42, 0.60, 0.34]].forEach(function (t) {
-                    var by = gy - trunkH - (h - trunkH) * t[1];
-                    var py = by - (h - trunkH) * t[2];
-                    var hw = (w / 2) * t[0];
-                    ctx.beginPath();
-                    ctx.moveTo(cx - hw, by); ctx.lineTo(cx + hw, by); ctx.lineTo(cx, py);
-                    ctx.closePath();
-                    ctx.fillStyle = 'rgba(18,48,22,0.42)';
-                    ctx.fill();
-                });
-            }
-
-            function house(ctx, x, gy, w, h, roofH, chimney, wins) {
-                var top = gy - h, cx = x + w / 2, peak = top - roofH;
-                ctx.fillStyle = '#091a0d'; ctx.fillRect(x, top, w, h);
-                ctx.beginPath();
-                ctx.moveTo(x - 6, top); ctx.lineTo(x + w + 6, top); ctx.lineTo(cx, peak);
-                ctx.closePath(); ctx.fillStyle = '#050e08'; ctx.fill();
-                ctx.beginPath();
-                ctx.moveTo(x - 6, top); ctx.lineTo(x + w + 6, top); ctx.lineTo(cx, peak - 5);
-                ctx.closePath(); ctx.fillStyle = 'rgba(232,248,238,0.82)'; ctx.fill();
-                if (chimney) {
-                    var chX = x + w * 0.72, chW = Math.max(8, w * 0.1);
-                    var slopeY = top + roofH * ((chX - (x + w + 6)) / (cx - (x + w + 6)));
-                    var chH = roofH * 0.65;
-                    ctx.fillStyle = '#0a1208'; ctx.fillRect(chX, slopeY - chH, chW, chH + 2);
-                    ctx.fillStyle = 'rgba(232,248,238,0.85)'; ctx.fillRect(chX - 2, slopeY - chH, chW + 4, 4);
-                    [0, 1, 2].forEach(function (i) {
-                        ctx.beginPath(); ctx.arc(chX + chW / 2 + i * 3, slopeY - chH - 10 - i * 10, 5 + i * 2, 0, Math.PI * 2);
-                        ctx.fillStyle = 'rgba(200,210,205,' + (0.10 - i * 0.025) + ')'; ctx.fill();
-                    });
-                }
-                var winW = Math.max(9, w * 0.17), winH = winW * 1.35, winY = top + h * 0.18, step = w / (wins + 1);
-                for (var i = 0; i < wins; i++) {
-                    var wx = x + step * (i + 1) - winW / 2;
-                    ctx.shadowColor = 'rgba(255,195,70,0.6)'; ctx.shadowBlur = 14;
-                    ctx.fillStyle = '#ffc85a'; ctx.fillRect(wx, winY, winW, winH);
-                    ctx.shadowBlur = 0;
-                    ctx.fillStyle = 'rgba(0,0,0,0.22)';
-                    ctx.fillRect(wx + winW / 2 - 1, winY, 2, winH);
-                    ctx.fillRect(wx, winY + winH / 2 - 1, winW, 2);
-                }
-                var dw = Math.max(10, w * 0.18), dh = Math.min(h * 0.38, 32), dx = cx - dw / 2;
-                ctx.fillStyle = '#140b02'; ctx.fillRect(dx, gy - dh, dw, dh);
-                ctx.beginPath(); ctx.arc(dx + dw / 2, gy - dh, dw / 2, Math.PI, 0);
-                ctx.fillStyle = '#140b02'; ctx.fill();
-                ctx.fillStyle = '#ffd700'; ctx.shadowColor = 'rgba(255,215,0,0.5)'; ctx.shadowBlur = 3;
-                ctx.beginPath(); ctx.arc(dx + dw * 0.72, gy - dh * 0.45, 2, 0, Math.PI * 2); ctx.fill();
+            var winW = Math.max(9, w * 0.17), winH = winW * 1.35, winY = top + h * 0.18, step = w / (wins + 1);
+            for (var i = 0; i < wins; i++) {
+                var wx = x + step * (i + 1) - winW / 2;
+                ctx.shadowColor = 'rgba(255,195,70,0.6)'; ctx.shadowBlur = 14;
+                ctx.fillStyle = '#ffc85a'; ctx.fillRect(wx, winY, winW, winH);
                 ctx.shadowBlur = 0;
+                ctx.fillStyle = 'rgba(0,0,0,0.22)';
+                ctx.fillRect(wx + winW/2 - 1, winY, 2, winH);
+                ctx.fillRect(wx, winY + winH/2 - 1, winW, 2);
             }
+            var dw = Math.max(10, w * 0.18), dh = Math.min(h * 0.38, 32), dx = cx - dw/2;
+            ctx.fillStyle = '#140b02'; ctx.fillRect(dx, gy - dh, dw, dh);
+            ctx.beginPath(); ctx.arc(dx + dw/2, gy - dh, dw/2, Math.PI, 0);
+            ctx.fillStyle = '#140b02'; ctx.fill();
+            ctx.fillStyle = '#ffd700'; ctx.shadowColor = 'rgba(255,215,0,0.5)'; ctx.shadowBlur = 3;
+            ctx.beginPath(); ctx.arc(dx + dw*0.72, gy - dh*0.45, 2, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+        }
 
-            function church(ctx, x, gy, s) {
-                var w = 90 * s, h = 100 * s, roofH = 36 * s;
-                var cx = x + w / 2, top = gy - h, peak = top - roofH;
-                ctx.fillStyle = '#091a0d'; ctx.fillRect(x, top, w, h);
-                ctx.beginPath(); ctx.moveTo(x - 6*s, top); ctx.lineTo(x + w + 6*s, top); ctx.lineTo(cx, peak);
-                ctx.closePath(); ctx.fillStyle = '#050e08'; ctx.fill();
-                ctx.beginPath(); ctx.moveTo(x - 6*s, top); ctx.lineTo(x + w + 6*s, top); ctx.lineTo(cx, peak - 5*s);
-                ctx.closePath(); ctx.fillStyle = 'rgba(232,248,238,0.82)'; ctx.fill();
-                var stW = 22*s, stX = cx - stW/2, stH = 52*s, stBase = peak;
-                ctx.fillStyle = '#091a0d'; ctx.fillRect(stX, stBase - stH, stW, stH);
-                var spH = 48*s;
-                ctx.beginPath(); ctx.moveTo(stX - 5*s, stBase - stH); ctx.lineTo(stX + stW + 5*s, stBase - stH); ctx.lineTo(cx, stBase - stH - spH);
-                ctx.closePath(); ctx.fillStyle = '#050e08'; ctx.fill();
-                ctx.beginPath(); ctx.moveTo(stX - 5*s, stBase - stH); ctx.lineTo(stX + stW + 5*s, stBase - stH); ctx.lineTo(cx, stBase - stH - spH - 4*s);
-                ctx.closePath(); ctx.fillStyle = 'rgba(232,248,238,0.85)'; ctx.fill();
-                var crossTip = stBase - stH - spH;
-                ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2.5*s;
-                ctx.shadowColor = 'rgba(255,215,0,0.7)'; ctx.shadowBlur = 8;
-                ctx.beginPath(); ctx.moveTo(cx, crossTip + 5*s); ctx.lineTo(cx, crossTip + 20*s); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(cx - 7*s, crossTip + 10*s); ctx.lineTo(cx + 7*s, crossTip + 10*s); ctx.stroke();
-                ctx.shadowBlur = 0; ctx.lineWidth = 1;
-                var bwW = 12*s, bwY = stBase - stH + 10*s;
-                ctx.shadowColor = 'rgba(255,195,70,0.45)'; ctx.shadowBlur = 8;
-                ctx.fillStyle = 'rgba(255,195,70,0.72)';
-                ctx.fillRect(cx - bwW/2, bwY, bwW, 16*s);
-                ctx.beginPath(); ctx.arc(cx, bwY, bwW/2, Math.PI, 0); ctx.fill();
-                ctx.shadowBlur = 0;
-                [[x + 12*s, top + 12*s], [x + w - 12*s - 14*s, top + 12*s]].forEach(function (pair) {
-                    var wx = pair[0], wy = pair[1], ww = 14*s, arc = ww/2;
-                    ctx.shadowColor = 'rgba(255,195,70,0.55)'; ctx.shadowBlur = 10;
-                    ctx.fillStyle = '#ffc85a'; ctx.fillRect(wx, wy + arc, ww, 20*s);
-                    ctx.beginPath(); ctx.arc(wx + arc, wy + arc, arc, Math.PI, 0); ctx.fill();
-                });
-                ctx.shadowBlur = 0;
-                var dw = 20*s, dh = 32*s, dx = cx - dw/2;
-                ctx.fillStyle = '#140b02'; ctx.fillRect(dx, gy - dh, dw, dh);
-                ctx.beginPath(); ctx.arc(dx + dw/2, gy - dh, dw/2, Math.PI, 0); ctx.fill();
-                ctx.fillStyle = '#ffd700'; ctx.shadowColor = 'rgba(255,215,0,0.5)'; ctx.shadowBlur = 3;
-                ctx.beginPath(); ctx.arc(dx + dw*0.72, gy - dh*0.45, 2, 0, Math.PI*2); ctx.fill();
-                ctx.shadowBlur = 0;
-            }
+        function church(ctx, x, gy, s) {
+            var w = 90*s, h = 100*s, roofH = 36*s;
+            var cx = x + w/2, top = gy - h, peak = top - roofH;
+            ctx.fillStyle = '#091a0d'; ctx.fillRect(x, top, w, h);
+            ctx.beginPath(); ctx.moveTo(x-6*s,top); ctx.lineTo(x+w+6*s,top); ctx.lineTo(cx,peak);
+            ctx.closePath(); ctx.fillStyle = '#050e08'; ctx.fill();
+            ctx.beginPath(); ctx.moveTo(x-6*s,top); ctx.lineTo(x+w+6*s,top); ctx.lineTo(cx,peak-5*s);
+            ctx.closePath(); ctx.fillStyle = 'rgba(232,248,238,0.82)'; ctx.fill();
+            var stW=22*s, stX=cx-stW/2, stH=52*s, stBase=peak;
+            ctx.fillStyle = '#091a0d'; ctx.fillRect(stX, stBase-stH, stW, stH);
+            var spH=48*s;
+            ctx.beginPath(); ctx.moveTo(stX-5*s,stBase-stH); ctx.lineTo(stX+stW+5*s,stBase-stH); ctx.lineTo(cx,stBase-stH-spH);
+            ctx.closePath(); ctx.fillStyle = '#050e08'; ctx.fill();
+            ctx.beginPath(); ctx.moveTo(stX-5*s,stBase-stH); ctx.lineTo(stX+stW+5*s,stBase-stH); ctx.lineTo(cx,stBase-stH-spH-4*s);
+            ctx.closePath(); ctx.fillStyle = 'rgba(232,248,238,0.85)'; ctx.fill();
+            var crossTip = stBase-stH-spH;
+            ctx.strokeStyle='#ffd700'; ctx.lineWidth=2.5*s;
+            ctx.shadowColor='rgba(255,215,0,0.7)'; ctx.shadowBlur=8;
+            ctx.beginPath(); ctx.moveTo(cx,crossTip+5*s); ctx.lineTo(cx,crossTip+20*s); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx-7*s,crossTip+10*s); ctx.lineTo(cx+7*s,crossTip+10*s); ctx.stroke();
+            ctx.shadowBlur=0; ctx.lineWidth=1;
+            var bwW=12*s, bwY=stBase-stH+10*s;
+            ctx.shadowColor='rgba(255,195,70,0.45)'; ctx.shadowBlur=8;
+            ctx.fillStyle='rgba(255,195,70,0.72)';
+            ctx.fillRect(cx-bwW/2, bwY, bwW, 16*s);
+            ctx.beginPath(); ctx.arc(cx, bwY, bwW/2, Math.PI, 0); ctx.fill();
+            ctx.shadowBlur=0;
+            [[x+12*s,top+12*s],[x+w-12*s-14*s,top+12*s]].forEach(function(p) {
+                var wx=p[0],wy=p[1],ww=14*s,arc=ww/2;
+                ctx.shadowColor='rgba(255,195,70,0.55)'; ctx.shadowBlur=10;
+                ctx.fillStyle='#ffc85a'; ctx.fillRect(wx,wy+arc,ww,20*s);
+                ctx.beginPath(); ctx.arc(wx+arc,wy+arc,arc,Math.PI,0); ctx.fill();
+            });
+            ctx.shadowBlur=0;
+            var dw=20*s,dh=32*s,dx=cx-dw/2;
+            ctx.fillStyle='#140b02'; ctx.fillRect(dx,gy-dh,dw,dh);
+            ctx.beginPath(); ctx.arc(dx+dw/2,gy-dh,dw/2,Math.PI,0); ctx.fill();
+            ctx.fillStyle='#ffd700'; ctx.shadowColor='rgba(255,215,0,0.5)'; ctx.shadowBlur=3;
+            ctx.beginPath(); ctx.arc(dx+dw*0.72,gy-dh*0.45,2,0,Math.PI*2); ctx.fill();
+            ctx.shadowBlur=0;
+        }
 
-            function drawVillage() {
-                vc.width = window.innerWidth; vc.height = window.innerHeight;
-                var W = vc.width, H = vc.height, s = W / 1440, gy = H;
-                var gr = vctx.createLinearGradient(0, H - 35*s, 0, H);
-                gr.addColorStop(0, 'rgba(210,240,225,0.0)');
-                gr.addColorStop(1, 'rgba(235,252,242,0.55)');
-                vctx.fillStyle = gr; vctx.fillRect(0, H - 35*s, W, 35*s);
-                [[180,32,48],[380,26,40],[560,30,46],[800,28,43],[1050,31,47],[1260,27,41],[1400,29,44]].forEach(function (t) {
-                    farTree(vctx, t[0]*s, gy - 32*s, t[1]*s, t[2]*s);
-                });
-                pineTree(vctx, 42*s, gy, 62*s, 82*s);
-                pineTree(vctx, 88*s, gy, 78*s, 108*s);
-                pineTree(vctx, 132*s, gy, 54*s, 72*s);
-                house(vctx, 168*s, gy, 68*s, 65*s, 38*s, false, 2);
-                pineTree(vctx, 278*s, gy, 72*s, 96*s);
-                house(vctx, 316*s, gy, 88*s, 82*s, 44*s, true, 2);
-                church(vctx, 438*s, gy, s);
-                pineTree(vctx, 618*s, gy, 68*s, 92*s);
-                house(vctx, 665*s, gy, 105*s, 92*s, 50*s, true, 3);
-                pineTree(vctx, 818*s, gy, 74*s, 100*s);
-                pineTree(vctx, 868*s, gy, 58*s, 78*s);
-                house(vctx, 915*s, gy, 74*s, 70*s, 40*s, false, 2);
-                house(vctx, 1035*s, gy, 62*s, 105*s, 55*s, true, 1);
-                pineTree(vctx, 1148*s, gy, 70*s, 95*s);
-                pineTree(vctx, 1200*s, gy, 84*s, 112*s);
-                pineTree(vctx, 1252*s, gy, 56*s, 76*s);
-                house(vctx, 1305*s, gy, 70*s, 66*s, 38*s, false, 2);
-                pineTree(vctx, 1408*s, gy, 74*s, 98*s);
-            }
+        function drawVillage() {
+            vc.width = window.innerWidth; vc.height = window.innerHeight;
+            var W=vc.width, H=vc.height, s=W/1440, gy=H;
+            var gr=vctx.createLinearGradient(0,H-35*s,0,H);
+            gr.addColorStop(0,'rgba(210,240,225,0.0)');
+            gr.addColorStop(1,'rgba(235,252,242,0.55)');
+            vctx.fillStyle=gr; vctx.fillRect(0,H-35*s,W,35*s);
+            [[180,32,48],[380,26,40],[560,30,46],[800,28,43],[1050,31,47],[1260,27,41],[1400,29,44]].forEach(function(t){
+                farTree(vctx,t[0]*s,gy-32*s,t[1]*s,t[2]*s);
+            });
+            pineTree(vctx,42*s,gy,62*s,82*s);
+            pineTree(vctx,88*s,gy,78*s,108*s);
+            pineTree(vctx,132*s,gy,54*s,72*s);
+            house(vctx,168*s,gy,68*s,65*s,38*s,false,2);
+            pineTree(vctx,278*s,gy,72*s,96*s);
+            house(vctx,316*s,gy,88*s,82*s,44*s,true,2);
+            church(vctx,438*s,gy,s);
+            pineTree(vctx,618*s,gy,68*s,92*s);
+            house(vctx,665*s,gy,105*s,92*s,50*s,true,3);
+            pineTree(vctx,818*s,gy,74*s,100*s);
+            pineTree(vctx,868*s,gy,58*s,78*s);
+            house(vctx,915*s,gy,74*s,70*s,40*s,false,2);
+            house(vctx,1035*s,gy,62*s,105*s,55*s,true,1);
+            pineTree(vctx,1148*s,gy,70*s,95*s);
+            pineTree(vctx,1200*s,gy,84*s,112*s);
+            pineTree(vctx,1252*s,gy,56*s,76*s);
+            house(vctx,1305*s,gy,70*s,66*s,38*s,false,2);
+            pineTree(vctx,1408*s,gy,74*s,98*s);
+        }
 
-            drawVillage();
-            window.addEventListener('resize', drawVillage);
-        })();
-    </script>
+        drawVillage();
+        window.addEventListener('resize', drawVillage);
+    })();
+</script>
 
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
-
 </html>
